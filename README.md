@@ -21,8 +21,8 @@ var schedule = new SlyckSchedule(data, { //data Required
       size: 10,
       color: [45, 49, 66, 1]
     },
-    colors: [[33, 150, 243, .5]],
-    strokes: [[33, 150, 243, 1]]
+    colors: [[33, 150, 243, .5]], //Can Hold an Array or Colors SUPPORTS HEX RGB RGBA | If more then one colors in array it will go through the list and use the colors
+    strokes: [[33, 150, 243, 1]] //Can Hold an Array or Colors SUPPORTS HEX RGB RGBA | If more then one colors in array it will go through the list and use the colors
   },
   graph: {
     colors: {
