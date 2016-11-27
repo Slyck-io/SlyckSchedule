@@ -1,0 +1,23 @@
+{
+  "name": "SlyckSchedule",
+  "homepage": "https://github.com/Slyck-io/SlyckSchedule",
+  "authors": [
+    "raymonddavis <raymond.davis.4th@gmail.com>"
+  ],
+  "description": "HTML5 Canvas and Javascript Task Schedule",
+  "main": "dist/js/slyckSchedule.min.js",
+  "keywords": [
+    "HTML5",
+    "Canvas",
+    "Javascript",
+    "Schedule"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
