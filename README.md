@@ -2,7 +2,7 @@
 HTML 5 Canvas and Javascript Task Schedule
 
 # Config
-`
+```javascript
 var schedule = new SlyckSchedule(data, { //data Required
   id: undefined, //Required if more then one schedule, if one schedule it can be used or <slyck-schedule></slyck-schedule> can be used
   data: {
@@ -39,7 +39,7 @@ var schedule = new SlyckSchedule(data, { //data Required
     }
   }
 });
-`
+```
 
 # Install
 bower install slyck-schedule
