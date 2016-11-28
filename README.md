@@ -14,6 +14,7 @@ var schedule = new SlyckSchedule(data, { //data Required
     }
   },
   card: {
+    tooltip: true,
     onClick: undefined,
     space: 2, //Min
     size: 15, //Min

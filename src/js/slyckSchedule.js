@@ -15,6 +15,11 @@
         self.ratio = undefined;
         self.width = 1500; //This will be interval * 25
         self.height = undefined;
+        self.current = undefined;
+        self.tt = {
+          x: 0,
+          y: 0
+        };
         self.cards = [];
         self.rows = [];
         self.interval = 60; //Make this custom
@@ -41,6 +46,7 @@
             }
           },
           card: {
+            tooltip: true,
             onClick: undefined,
             space: 2,
             size: 15,
@@ -172,11 +178,13 @@
         window.addEventListener('resize', self.reDraw, false);
         
         var dragging = false;
+        var click = true;
         var lastX;
         
         this.canvas.addEventListener('mousedown', function(e) {
             var evt = e || event;
             dragging = true;
+            click = true;
             lastX = evt.clientX;
             e.preventDefault();
         });
@@ -184,6 +192,7 @@
         window.addEventListener('mousemove', function(e) {
             var evt = e || event;
             if (dragging) {
+                click = false;
                 var delta = evt.clientX - lastX;
                 lastX = evt.clientX;
                 self.marginLeft += delta;
@@ -197,6 +206,34 @@
         window.addEventListener('mouseup', function() {
             dragging = false;
         }, false);
+        
+        window.addEventListener('mousemove', function(event) {
+          if(self.settings.card.tooltip) {
+            var rect = self.canvas.getBoundingClientRect();
+            var clickedX = event.pageX - rect.left;
+            var clickedY = event.pageY - rect.top;
+            var found = false;
+
+            for (var i = 0; i < self.cards.length; i++) {
+              if (clickedX < (self.cards[i].right) &&
+                clickedX > (self.cards[i].left) && 
+                clickedY > (self.cards[i].top) && 
+                clickedY < (self.cards[i].bottom)) {
+                  self.tt.x = clickedX;
+                  self.tt.y = clickedY;
+                  self.current = self.cards[i];
+                  self.canvas.style.cursor = 'pointer';
+                  found = true;
+                  break;
+              }
+            }
+            if(!found) {
+              self.current = undefined;
+              self.canvas.style.cursor = 'default';
+            }
+            self.reDraw();
+          }
+        }, false);
 
         this.canvas.addEventListener('click', function(event) {
           if (typeof self.settings.card.onClick == 'undefined') {
@@ -204,21 +241,24 @@
             console.info('The Card onClick functions lets you pass the data to a function when the user clicks on its card');
             return;
           }
-          var rect = self.canvas.getBoundingClientRect();
-          var clickedX = event.pageX - rect.left;
-          var clickedY = event.pageY - rect.top;
-          var scaleX = (self.scale.x != 0 ? self.scale.x : 1);
-          var scaleY = (self.scale.y != 0 ? self.scale.y : 1);
+          if(click) {
+            var rect = self.canvas.getBoundingClientRect();
+            var clickedX = event.pageX - rect.left;
+            var clickedY = event.pageY - rect.top;
+            var scaleX = (self.scale.x != 0 ? self.scale.x : 1);
+            var scaleY = (self.scale.y != 0 ? self.scale.y : 1);
 
-          for (var i = 0; i < self.cards.length; i++) {
-            if (clickedX < (self.cards[i].right) &&
-                clickedX > (self.cards[i].left) && 
-                clickedY > (self.cards[i].top) && 
-                clickedY < (self.cards[i].bottom)) {
-                self.settings.card.onClick(self.cards[i].data);
-                break;
+            for (var i = 0; i < self.cards.length; i++) {
+              if (clickedX < (self.cards[i].right) &&
+                  clickedX > (self.cards[i].left) && 
+                  clickedY > (self.cards[i].top) && 
+                  clickedY < (self.cards[i].bottom)) {
+                  self.settings.card.onClick(self.cards[i].data);
+                  break;
+              }
             }
           }
+          click = true;
         }, false);
         
         self.load();
@@ -504,6 +544,71 @@
             // current value + 1 % array_length gives back the next value but once it hits the last element it returns to 0
           }
         }
+        if(this.settings.card.tooltip && typeof this.current != 'undefined') {
+          var start_time = new Date((this.current.values.start * 1000) + (new Date().getTimezoneOffset() * 60000));
+          var end_time = new Date((this.current.values.end * 1000) + (new Date().getTimezoneOffset() * 60000));
+          var text;
+          if (this.settings.graph.time.format == 0) {
+            var h = start_time.getHours();
+            var m = start_time.getMinutes();
+            m = (m < 10 ? '0'+m: m);
+            var time = (h <= 12 ? 'am' : 'pm');
+            if (time == 'pm') h -= 12;
+            var start = h+':'+m+' '+time;
+            
+            h = end_time.getHours();
+            m = end_time.getMinutes();
+            m = (m < 10 ? '0'+m: m);
+            time = (h <= 12 ? 'am' : 'pm');
+            if (time == 'pm') h -= 12;
+            var end = h+':'+m+' '+time;
+            
+            text = start+' til '+end; 
+          }
+          if (this.settings.graph.time.format == 1) {
+            var h = start_time.getHours();
+            var m = start_time.getMinutes();
+            m = (m < 10 ? '0'+m: m);
+            var start = h+':'+m;
+            
+            h = end_time.getHours();
+            m = end_time.getMinutes();
+            m = (m < 10 ? '0'+m: m);
+            var end = h+':'+m;
+            
+            text = start+' til '+end; 
+          }
+          
+          var rectWidth = context.measureText(text).width + 10;
+          var rectHeight = 25;
+          var rectX = this.tt.x-(rectWidth)-2;
+          var rectY = this.tt.y-(rectHeight);
+          var radius = 5;
+          var text_x = rectX + 5;
+          var text_y = rectHeight + rectY - (this.settings.card.label.size / 2) - 2;
+
+          context.fillStyle = 'rgba(0, 0, 0, .5)';
+          context.strokeStyle = 'rgba(0, 0, 0, 1)';
+          context.lineWidth = 1;
+          context.beginPath();
+          context.moveTo(rectX + radius, rectY);
+          context.lineTo(rectX + rectWidth - radius, rectY);
+          context.quadraticCurveTo(rectX + rectWidth, rectY, rectX + rectWidth, rectY + radius);
+          context.lineTo(rectX + rectWidth, rectY + rectHeight - radius);
+          context.quadraticCurveTo(rectX + rectWidth, rectY + rectHeight, rectX + rectWidth - radius, rectY + rectHeight);
+          context.lineTo(rectX + radius, rectY + rectHeight);
+          context.quadraticCurveTo(rectX, rectY + rectHeight, rectX, rectY + rectHeight - radius);
+          context.lineTo(rectX, rectY + radius);
+          context.quadraticCurveTo(rectX, rectY, rectX + radius, rectY);
+          context.closePath();
+          context.stroke();
+          context.fill();
+          context.beginPath();
+          context.font = this.settings.card.label.size + 'pt Calibri';
+          context.fillStyle = 'rgba(255, 255, 255, 1)';
+          context.fillText(text, text_x, text_y);
+          context.closePath();
+        }
         context.restore();
       },
       drawCard: function(card, index) {
@@ -520,7 +625,7 @@
         context.fillStyle = ((this.settings.card.colors.length > 1) ? this.getCardColor(this.count.fill, 'fill') : this.getCardColor(0, 'fill'));
         context.fill();
         context.closePath();
-
+        
         context.beginPath();
         context.font = this.settings.card.label.size + 'pt Calibri';
         context.fillStyle = this.settings.card.label.color;
