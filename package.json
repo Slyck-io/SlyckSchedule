@@ -1,0 +1,38 @@
+{
+  "name": "SlyckSchedule",
+  "version": "0.0.3",
+  "description": "HTML5 Canvas and Javascript Task Schedule",
+  "main": "dist/js/slyckSchedule.min.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Slyck-io/SlyckSchedule.git"
+  },
+  "keywords": [
+    "HTML5",
+    "Canvas",
+    "Javascript",
+    "Schedule"
+  ],
+  "author": "raymonddavis <raymond.davis.4th@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Slyck-io/SlyckSchedule/issues"
+  },
+  "homepage": "https://github.com/Slyck-io/SlyckSchedule",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-autoprefixer": "^3.0.4",
+    "grunt-bump": "^0.8.0",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-cssmin": "^1.0.2",
+    "grunt-contrib-less": "^1.4.0",
+    "grunt-contrib-uglify": "^2.0.0",
+    "grunt-contrib-watch": "^1.0.0"
+  }
+}

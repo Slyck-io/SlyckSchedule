@@ -1,0 +1,24 @@
+.slyck-schedule {
+  display: block;
+  overflow: hidden;
+}
+.slyck-schedule .slyck-schedule-ui {
+  position: absolute;
+  pointer-events: none;
+}
+.slyck-schedule .end-right {
+  pointer-events: none;
+  background-image: -webkit-linear-gradient(left, rgba(255, 255, 255, 0), #ffffff);
+  background: linear-gradient(to right, rgba(255, 255, 255, 0), #ffffff);
+  filter: progid: DXImageTransform.Microsoft.gradient(GradientType=1, StartColorStr='#00ffffff', EndColorStr='#ffffff');
+  position: absolute;
+  width: 60px;
+}
+.slyck-schedule .end-left {
+  pointer-events: none;
+  background-image: -webkit-linear-gradient(right, rgba(255, 255, 255, 0), #ffffff);
+  background: linear-gradient(to left, rgba(255, 255, 255, 0), #ffffff);
+  filter: progid: DXImageTransform.Microsoft.gradient(GradientType=1, StartColorStr='#ffffff', EndColorStr='#00ffffff');
+  position: absolute;
+  width: 60px;
+}
