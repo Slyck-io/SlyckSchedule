@@ -10,6 +10,41 @@
     <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
     <link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/Slyck-io/SlyckSchedule/master/dist/css/slyckSchedule.min.css">
     <script src="https://cdn.rawgit.com/Slyck-io/SlyckSchedule/master/dist/js/slyckSchedule.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded',function(){
+        var data = [{
+          name: 'Ray',
+          startTime: '1479837924',
+          endTime: '1479845124'
+        }, {
+          name: 'Bob',
+          startTime: '1479794724',
+          endTime: '1479816324',
+        }, {
+          name: 'Bill',
+          startTime: '1479794724',
+          endTime: '1479805524'
+        }, {
+          name: 'Steve',
+          startTime: '1479794724',
+          endTime: '1479845124'
+        }, {
+          name: 'Frank',
+          startTime: '1479837924',
+          endTime: '1479845124'
+        }];
+        
+        var directive = new SlyckSchedule(data, {
+          data: {
+            label: 'name',
+            time: {
+              start: 'startTime',
+              end: 'endTime'
+            }
+          }
+        });
+      });
+    </script>
   </head>
   <body>
     <section class="page-header">
