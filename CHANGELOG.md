@@ -1,4 +1,12 @@
-<A name="0.0.2"></a>
+<a name="1.0.0"></a>
+### 1.0.0 (11-28-2016)
+
+
+#### Features
+
+* You can now update the data in the graph by calling the update function
+
+<a name="0.0.2"></a>
 ### 0.0.2 (11-27-2016)
 
 
