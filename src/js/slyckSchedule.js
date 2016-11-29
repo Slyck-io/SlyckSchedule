@@ -189,7 +189,7 @@
             e.preventDefault();
         });
 
-        window.addEventListener('mousemove', function(e) {
+        this.canvas.addEventListener('mousemove', function(e) {
             var evt = e || event;
             if (dragging) {
                 click = false;
@@ -203,17 +203,18 @@
             e.preventDefault();
         }, false);
 
-        window.addEventListener('mouseup', function() {
+        this.canvas.addEventListener('mouseup', function() {
             dragging = false;
         }, false);
         
-        window.addEventListener('mousemove', function(event) {
+        this.canvas.addEventListener('mousemove', function(event) {
           if(self.settings.card.tooltip) {
+            var container = self.slyck.getBoundingClientRect();
             var rect = self.canvas.getBoundingClientRect();
-            var clickedX = event.pageX - rect.left;
-            var clickedY = event.pageY - rect.top;
+            var clickedX = event.pageX - rect.left - window.scrollX;
+            var clickedY = event.pageY - rect.top - window.scrollY;
             var found = false;
-
+            
             for (var i = 0; i < self.cards.length; i++) {
               if (clickedX < (self.cards[i].right) &&
                 clickedX > (self.cards[i].left) && 
@@ -236,15 +237,16 @@
         }, false);
 
         this.canvas.addEventListener('click', function(event) {
-          if (typeof self.settings.card.onClick == 'undefined') {
-            console.error('Missing Card onClick Function');
-            console.info('The Card onClick functions lets you pass the data to a function when the user clicks on its card');
-            return;
-          }
           if(click) {
+            if (typeof self.settings.card.onClick == 'undefined') {
+              console.error('Missing Card onClick Function');
+              console.info('The Card onClick functions lets you pass the data to a function when the user clicks on its card');
+              return;
+            }
+            
             var rect = self.canvas.getBoundingClientRect();
-            var clickedX = event.pageX - rect.left;
-            var clickedY = event.pageY - rect.top;
+            var clickedX = event.pageX - rect.left - window.scrollX;
+            var clickedY = event.pageY - rect.top - window.scrollY;
             var scaleX = (self.scale.x != 0 ? self.scale.x : 1);
             var scaleY = (self.scale.y != 0 ? self.scale.y : 1);
 
