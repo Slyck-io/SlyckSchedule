@@ -2,7 +2,7 @@
   "use strict";
 
   var common = {
-          publicMethods: [],
+          publicMethods: ['update'],
           className: 'SlyckSchedule'
       },
       Protected = function (data, options) {
@@ -261,7 +261,7 @@
           click = true;
         }, false);
         
-        self.load();
+        self.load(self.data);
         self.layout();
         self.draw();
       },
@@ -402,9 +402,8 @@
         }
         return values;
       },
-      load: function() {
+      load: function(data) {
         var rows = this.rows;
-        var data = this.data;
         var values;
         for (var i = 0; i < data.length; i++) {
           values = this.getValues(data[i]);
@@ -653,6 +652,13 @@
         this.clear();
         this.layout();
         this.draw();
+      },
+      update: function(data) {
+        this.data = data;
+        this.rows = [];
+        this.cards = [];
+        this.load(data);
+        this.reDraw();
       }
 };
   
