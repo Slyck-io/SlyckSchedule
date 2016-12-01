@@ -24,6 +24,7 @@
             };
             self.cards = [];
             self.rows = [];
+            self.backup = [];
             self.scale = {
                 x: 0,
                 y: 0
@@ -246,14 +247,12 @@
                             clickedX > (self.cards[i].left) &&
                             clickedY > (self.cards[i].top) &&
                             clickedY < (self.cards[i].bottom)) {
-                            if (self.filterItem == 'All' || self.cards[i].values.label == self.filterItem) {
-                              self.tt.x = clickedX;
-                              self.tt.y = clickedY;
-                              self.current = self.cards[i];
-                              self.canvas.style.cursor = 'pointer';
-                              found = true;
-                              break;
-                            }
+                            self.tt.x = clickedX;
+                            self.tt.y = clickedY;
+                            self.current = self.cards[i];
+                            self.canvas.style.cursor = 'pointer';
+                            found = true;
+                            break;
                         }
                     }
                     if (!found) {
@@ -455,56 +454,58 @@
             var values;
             for (var i = 0; i < data.length; i++) {
                 values = this.getValues(data[i]);
-                if (i == 0) {
-                    if (typeof values.label == 'undefined') {
-                        if (self.settings.debug) {
-                            console.error('No Data Label Found');
-                            console.error('Data Label Must be Found or we can not label the card');
-                        }
-                        return;
-                    }
-                    if (typeof values.start == 'undefined') {
-                        if (self.settings.debug) {
-                            console.error('No Data Start Found');
-                            console.error('Data Start Must be Found or we can not label the card');
-                        }
-                        return;
-                    }
-                    if (typeof values.end == 'undefined') {
-                        if (self.settings.debug) {
-                            console.error('No Data End Found');
-                            console.error('Data End Must be Found or we can not label the card');
-                        }
-                        return;
-                    }
-                }
-                var start_time = new Date((values.start * 1000) + (new Date().getTimezoneOffset() * 60000));
-                var end_time = new Date((values.end * 1000) + (new Date().getTimezoneOffset() * 60000));
-                var start_pos = (start_time.getHours() * this.interval) + this.interval + start_time.getMinutes();
-                var end_pos = (end_time.getHours() * this.interval) + this.interval + end_time.getMinutes();
-                var hor_index = 0;
-                var check = false;
-
-                if (rows.length) {
-                    for (var j = 0; j < rows.length; j++) {
-                        for (var x = 0; x < rows[j].length; x++) {
-                            if ((rows[j][x].start == start_pos) || ((rows[j][x].start < start_pos) && (rows[j][x].end > start_pos) || ((rows[j][x].start < end_pos) && (rows[j][x].end > end_pos)) || ((rows[j][x].start < start_pos) && (rows[j][x].end > end_pos)) || ((rows[j][x].start > start_pos) && (rows[j][x].end < end_pos)))) {
-                                hor_index++;
-                                check = true;
-                                break;
+                if (this.filterItem == 'All' || values.label == this.filterItem) {
+                    if (i == 0) {
+                        if (typeof values.label == 'undefined') {
+                            if (self.settings.debug) {
+                                console.error('No Data Label Found');
+                                console.error('Data Label Must be Found or we can not label the card');
                             }
+                            return;
                         }
-                        if (!check && hor_index == j) break;
-                        check = false;
+                        if (typeof values.start == 'undefined') {
+                            if (self.settings.debug) {
+                                console.error('No Data Start Found');
+                                console.error('Data Start Must be Found or we can not label the card');
+                            }
+                            return;
+                        }
+                        if (typeof values.end == 'undefined') {
+                            if (self.settings.debug) {
+                                console.error('No Data End Found');
+                                console.error('Data End Must be Found or we can not label the card');
+                            }
+                            return;
+                        }
                     }
+                    var start_time = new Date((values.start * 1000) + (new Date().getTimezoneOffset() * 60000));
+                    var end_time = new Date((values.end * 1000) + (new Date().getTimezoneOffset() * 60000));
+                    var start_pos = (start_time.getHours() * this.interval) + this.interval + start_time.getMinutes();
+                    var end_pos = (end_time.getHours() * this.interval) + this.interval + end_time.getMinutes();
+                    var hor_index = 0;
+                    var check = false;
+
+                    if (rows.length) {
+                        for (var j = 0; j < rows.length; j++) {
+                            for (var x = 0; x < rows[j].length; x++) {
+                                if ((rows[j][x].start == start_pos) || ((rows[j][x].start < start_pos) && (rows[j][x].end > start_pos) || ((rows[j][x].start < end_pos) && (rows[j][x].end > end_pos)) || ((rows[j][x].start < start_pos) && (rows[j][x].end > end_pos)) || ((rows[j][x].start > start_pos) && (rows[j][x].end < end_pos)))) {
+                                    hor_index++;
+                                    check = true;
+                                    break;
+                                }
+                            }
+                            if (!check && hor_index == j) break;
+                            check = false;
+                        }
+                    }
+
+                    if (!rows[hor_index]) rows.push(new Array());
+
+                    var card = this.Card(start_pos, this.getOffset(hor_index) + (hor_index * this.settings.card.size), end_pos - start_pos, this.settings.card.size, values, data[i]);
+
+                    rows[hor_index].push({ start: start_pos, end: end_pos, card: card });
+                    this.cards.push(card);
                 }
-
-                if (!rows[hor_index]) rows.push(new Array());
-
-                var card = this.Card(start_pos, this.getOffset(hor_index) + (hor_index * this.settings.card.size), end_pos - start_pos, this.settings.card.size, values, data[i]);
-
-                rows[hor_index].push({ start: start_pos, end: end_pos, card: card });
-                this.cards.push(card);
             }
             this.rows = rows;
         },
@@ -591,80 +592,76 @@
             context.save();
             for (var i = 0; i < this.rows.length; i++) {
                 for (var j = 0; j < this.rows[i].length; j++) {
-                    if (this.filterItem == 'All' || this.rows[i][j].card.values.label == this.filterItem) {
-                        this.drawCard(this.rows[i][j].card, i);
-                        this.count.stroke = (this.count.stroke + 1) % this.settings.card.strokes.length;
-                        this.count.fill = (this.count.fill + 1) % this.settings.card.colors.length;
-                        // current value + 1 % array_length gives back the next value but once it hits the last element it returns to 0
-                    }
+                    this.drawCard(this.rows[i][j].card, i);
+                    this.count.stroke = (this.count.stroke + 1) % this.settings.card.strokes.length;
+                    this.count.fill = (this.count.fill + 1) % this.settings.card.colors.length;
+                    // current value + 1 % array_length gives back the next value but once it hits the last element it returns to 0
                 }
             }
             if (this.settings.card.tooltip && typeof this.current != 'undefined') {
-                if (this.filterItem == 'All' || this.current.values.label == this.filterItem) { 
-                    var start_time = new Date((this.current.values.start * 1000) + (new Date().getTimezoneOffset() * 60000));
-                    var end_time = new Date((this.current.values.end * 1000) + (new Date().getTimezoneOffset() * 60000));
-                    var text;
-                    if (this.settings.graph.time.format == 0) {
-                        var h = start_time.getHours();
-                        var m = start_time.getMinutes();
-                        m = (m < 10 ? '0' + m : m);
-                        var time = (h <= 12 ? 'am' : 'pm');
-                        if (time == 'pm') h -= 12;
-                        var start = h + ':' + m + ' ' + time;
+                var start_time = new Date((this.current.values.start * 1000) + (new Date().getTimezoneOffset() * 60000));
+                var end_time = new Date((this.current.values.end * 1000) + (new Date().getTimezoneOffset() * 60000));
+                var text;
+                if (this.settings.graph.time.format == 0) {
+                    var h = start_time.getHours();
+                    var m = start_time.getMinutes();
+                    m = (m < 10 ? '0' + m : m);
+                    var time = (h <= 12 ? 'am' : 'pm');
+                    if (time == 'pm') h -= 12;
+                    var start = h + ':' + m + ' ' + time;
 
-                        h = end_time.getHours();
-                        m = end_time.getMinutes();
-                        m = (m < 10 ? '0' + m : m);
-                        time = (h <= 12 ? 'am' : 'pm');
-                        if (time == 'pm') h -= 12;
-                        var end = h + ':' + m + ' ' + time;
+                    h = end_time.getHours();
+                    m = end_time.getMinutes();
+                    m = (m < 10 ? '0' + m : m);
+                    time = (h <= 12 ? 'am' : 'pm');
+                    if (time == 'pm') h -= 12;
+                    var end = h + ':' + m + ' ' + time;
 
-                        text = start + ' til ' + end;
-                    }
-                    if (this.settings.graph.time.format == 1) {
-                        var h = start_time.getHours();
-                        var m = start_time.getMinutes();
-                        m = (m < 10 ? '0' + m : m);
-                        var start = h + ':' + m;
-
-                        h = end_time.getHours();
-                        m = end_time.getMinutes();
-                        m = (m < 10 ? '0' + m : m);
-                        var end = h + ':' + m;
-
-                        text = start + ' til ' + end;
-                    }
-
-                    var rectWidth = context.measureText(text).width + 10;
-                    var rectHeight = 25;
-                    var rectX = this.tt.x - (rectWidth) - 2;
-                    var rectY = this.tt.y - (rectHeight);
-                    var radius = 5;
-                    var text_x = rectX + 5;
-                    var text_y = rectHeight + rectY - (this.settings.card.label.size / 2) - 2;
-
-                    context.fillStyle = 'rgba(0, 0, 0, .5)';
-                    context.strokeStyle = 'rgba(0, 0, 0, 1)';
-                    context.lineWidth = 1;
-                    context.beginPath();
-                    context.moveTo(rectX + radius, rectY);
-                    context.lineTo(rectX + rectWidth - radius, rectY);
-                    context.quadraticCurveTo(rectX + rectWidth, rectY, rectX + rectWidth, rectY + radius);
-                    context.lineTo(rectX + rectWidth, rectY + rectHeight - radius);
-                    context.quadraticCurveTo(rectX + rectWidth, rectY + rectHeight, rectX + rectWidth - radius, rectY + rectHeight);
-                    context.lineTo(rectX + radius, rectY + rectHeight);
-                    context.quadraticCurveTo(rectX, rectY + rectHeight, rectX, rectY + rectHeight - radius);
-                    context.lineTo(rectX, rectY + radius);
-                    context.quadraticCurveTo(rectX, rectY, rectX + radius, rectY);
-                    context.closePath();
-                    context.stroke();
-                    context.fill();
-                    context.beginPath();
-                    context.font = this.settings.card.label.size + 'pt Calibri';
-                    context.fillStyle = 'rgba(255, 255, 255, 1)';
-                    context.fillText(text, text_x, text_y);
-                    context.closePath();
+                    text = start + ' til ' + end;
                 }
+                if (this.settings.graph.time.format == 1) {
+                    var h = start_time.getHours();
+                    var m = start_time.getMinutes();
+                    m = (m < 10 ? '0' + m : m);
+                    var start = h + ':' + m;
+
+                    h = end_time.getHours();
+                    m = end_time.getMinutes();
+                    m = (m < 10 ? '0' + m : m);
+                    var end = h + ':' + m;
+
+                    text = start + ' til ' + end;
+                }
+
+                var rectWidth = context.measureText(text).width + 10;
+                var rectHeight = 25;
+                var rectX = this.tt.x - (rectWidth) - 2;
+                var rectY = this.tt.y - (rectHeight);
+                var radius = 5;
+                var text_x = rectX + 5;
+                var text_y = rectHeight + rectY - (this.settings.card.label.size / 2) - 2;
+
+                context.fillStyle = 'rgba(0, 0, 0, .5)';
+                context.strokeStyle = 'rgba(0, 0, 0, 1)';
+                context.lineWidth = 1;
+                context.beginPath();
+                context.moveTo(rectX + radius, rectY);
+                context.lineTo(rectX + rectWidth - radius, rectY);
+                context.quadraticCurveTo(rectX + rectWidth, rectY, rectX + rectWidth, rectY + radius);
+                context.lineTo(rectX + rectWidth, rectY + rectHeight - radius);
+                context.quadraticCurveTo(rectX + rectWidth, rectY + rectHeight, rectX + rectWidth - radius, rectY + rectHeight);
+                context.lineTo(rectX + radius, rectY + rectHeight);
+                context.quadraticCurveTo(rectX, rectY + rectHeight, rectX, rectY + rectHeight - radius);
+                context.lineTo(rectX, rectY + radius);
+                context.quadraticCurveTo(rectX, rectY, rectX + radius, rectY);
+                context.closePath();
+                context.stroke();
+                context.fill();
+                context.beginPath();
+                context.font = this.settings.card.label.size + 'pt Calibri';
+                context.fillStyle = 'rgba(255, 255, 255, 1)';
+                context.fillText(text, text_x, text_y);
+                context.closePath();
             }
             context.restore();
         },
@@ -709,6 +706,7 @@
             this.context.restore();
         },
         reDraw: function() {
+            this.height = undefined;
             this.clear();
             this.layout();
             this.draw();
@@ -717,12 +715,15 @@
             this.data = data;
             this.rows = [];
             this.cards = [];
-            this.height = undefined;
             this.load(data);
             this.reDraw();
         },
         filter: function(data) {
+            this.backup = this.rows;
+            this.rows = [];
+            this.cards = [];
             this.filterItem = data;
+            this.load(this.data);
             this.reDraw();
         }
     };
