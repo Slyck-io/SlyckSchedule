@@ -1,3 +1,11 @@
+<a name="1.0.1"></a>
+### 1.0.1 (11-28-2016)
+
+
+#### Bugs Fixed
+
+* Fixed scrolling bug where tooltips would misplace or not place at all
+
 <a name="1.0.0"></a>
 ### 1.0.0 (11-28-2016)
 
