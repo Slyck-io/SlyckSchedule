@@ -187,7 +187,6 @@
             this.canvasCard.id = "cards";
             this.marginLeft = -((this.width / 2) - (this.slyck.offsetWidth / 2));
             this.canvasCard.style.display = 'inline-block';
-            this.canvasCard.style.position = 'absolute';
             this.canvasCard.style.pointerEvents = 'none';
             this.canvasCard.style.marginLeft = self.marginLeft + "px";
             this.slyck.appendChild(this.canvasCard);
@@ -688,6 +687,7 @@
                 context.closePath();
             }
             context.restore();
+            this.clear(this.contextCard);
         },
         drawCard: function(card, index) {
             var context = this.context;
