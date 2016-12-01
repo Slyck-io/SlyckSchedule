@@ -2,7 +2,7 @@
     "use strict";
 
     var common = {
-            publicMethods: ['update'],
+            publicMethods: ['update', 'filter'],
             className: 'SlyckSchedule'
         },
         Protected = function(data, options) {
@@ -13,16 +13,17 @@
 
             self.data = data;
             self.ratio = undefined;
+            self.interval = 60; //Make this custom
             self.width = 1500; //This will be interval * 25
             self.height = undefined;
             self.current = undefined;
+            self.filterItem = 'All';
             self.tt = {
                 x: 0,
                 y: 0
             };
             self.cards = [];
             self.rows = [];
-            self.interval = 60; //Make this custom
             self.scale = {
                 x: 0,
                 y: 0
@@ -245,12 +246,14 @@
                             clickedX > (self.cards[i].left) &&
                             clickedY > (self.cards[i].top) &&
                             clickedY < (self.cards[i].bottom)) {
-                            self.tt.x = clickedX;
-                            self.tt.y = clickedY;
-                            self.current = self.cards[i];
-                            self.canvas.style.cursor = 'pointer';
-                            found = true;
-                            break;
+                            if (self.filterItem == 'All' || self.cards[i].values.label == self.filterItem) {
+                              self.tt.x = clickedX;
+                              self.tt.y = clickedY;
+                              self.current = self.cards[i];
+                              self.canvas.style.cursor = 'pointer';
+                              found = true;
+                              break;
+                            }
                         }
                     }
                     if (!found) {
@@ -588,76 +591,80 @@
             context.save();
             for (var i = 0; i < this.rows.length; i++) {
                 for (var j = 0; j < this.rows[i].length; j++) {
-                    this.drawCard(this.rows[i][j].card, i);
-                    this.count.stroke = (this.count.stroke + 1) % this.settings.card.strokes.length;
-                    this.count.fill = (this.count.fill + 1) % this.settings.card.colors.length;
-                    // current value + 1 % array_length gives back the next value but once it hits the last element it returns to 0
+                    if (this.filterItem == 'All' || this.rows[i][j].card.values.label == this.filterItem) {
+                        this.drawCard(this.rows[i][j].card, i);
+                        this.count.stroke = (this.count.stroke + 1) % this.settings.card.strokes.length;
+                        this.count.fill = (this.count.fill + 1) % this.settings.card.colors.length;
+                        // current value + 1 % array_length gives back the next value but once it hits the last element it returns to 0
+                    }
                 }
             }
             if (this.settings.card.tooltip && typeof this.current != 'undefined') {
-                var start_time = new Date((this.current.values.start * 1000) + (new Date().getTimezoneOffset() * 60000));
-                var end_time = new Date((this.current.values.end * 1000) + (new Date().getTimezoneOffset() * 60000));
-                var text;
-                if (this.settings.graph.time.format == 0) {
-                    var h = start_time.getHours();
-                    var m = start_time.getMinutes();
-                    m = (m < 10 ? '0' + m : m);
-                    var time = (h <= 12 ? 'am' : 'pm');
-                    if (time == 'pm') h -= 12;
-                    var start = h + ':' + m + ' ' + time;
+                if (this.filterItem == 'All' || this.current.values.label == this.filterItem) { 
+                    var start_time = new Date((this.current.values.start * 1000) + (new Date().getTimezoneOffset() * 60000));
+                    var end_time = new Date((this.current.values.end * 1000) + (new Date().getTimezoneOffset() * 60000));
+                    var text;
+                    if (this.settings.graph.time.format == 0) {
+                        var h = start_time.getHours();
+                        var m = start_time.getMinutes();
+                        m = (m < 10 ? '0' + m : m);
+                        var time = (h <= 12 ? 'am' : 'pm');
+                        if (time == 'pm') h -= 12;
+                        var start = h + ':' + m + ' ' + time;
 
-                    h = end_time.getHours();
-                    m = end_time.getMinutes();
-                    m = (m < 10 ? '0' + m : m);
-                    time = (h <= 12 ? 'am' : 'pm');
-                    if (time == 'pm') h -= 12;
-                    var end = h + ':' + m + ' ' + time;
+                        h = end_time.getHours();
+                        m = end_time.getMinutes();
+                        m = (m < 10 ? '0' + m : m);
+                        time = (h <= 12 ? 'am' : 'pm');
+                        if (time == 'pm') h -= 12;
+                        var end = h + ':' + m + ' ' + time;
 
-                    text = start + ' til ' + end;
+                        text = start + ' til ' + end;
+                    }
+                    if (this.settings.graph.time.format == 1) {
+                        var h = start_time.getHours();
+                        var m = start_time.getMinutes();
+                        m = (m < 10 ? '0' + m : m);
+                        var start = h + ':' + m;
+
+                        h = end_time.getHours();
+                        m = end_time.getMinutes();
+                        m = (m < 10 ? '0' + m : m);
+                        var end = h + ':' + m;
+
+                        text = start + ' til ' + end;
+                    }
+
+                    var rectWidth = context.measureText(text).width + 10;
+                    var rectHeight = 25;
+                    var rectX = this.tt.x - (rectWidth) - 2;
+                    var rectY = this.tt.y - (rectHeight);
+                    var radius = 5;
+                    var text_x = rectX + 5;
+                    var text_y = rectHeight + rectY - (this.settings.card.label.size / 2) - 2;
+
+                    context.fillStyle = 'rgba(0, 0, 0, .5)';
+                    context.strokeStyle = 'rgba(0, 0, 0, 1)';
+                    context.lineWidth = 1;
+                    context.beginPath();
+                    context.moveTo(rectX + radius, rectY);
+                    context.lineTo(rectX + rectWidth - radius, rectY);
+                    context.quadraticCurveTo(rectX + rectWidth, rectY, rectX + rectWidth, rectY + radius);
+                    context.lineTo(rectX + rectWidth, rectY + rectHeight - radius);
+                    context.quadraticCurveTo(rectX + rectWidth, rectY + rectHeight, rectX + rectWidth - radius, rectY + rectHeight);
+                    context.lineTo(rectX + radius, rectY + rectHeight);
+                    context.quadraticCurveTo(rectX, rectY + rectHeight, rectX, rectY + rectHeight - radius);
+                    context.lineTo(rectX, rectY + radius);
+                    context.quadraticCurveTo(rectX, rectY, rectX + radius, rectY);
+                    context.closePath();
+                    context.stroke();
+                    context.fill();
+                    context.beginPath();
+                    context.font = this.settings.card.label.size + 'pt Calibri';
+                    context.fillStyle = 'rgba(255, 255, 255, 1)';
+                    context.fillText(text, text_x, text_y);
+                    context.closePath();
                 }
-                if (this.settings.graph.time.format == 1) {
-                    var h = start_time.getHours();
-                    var m = start_time.getMinutes();
-                    m = (m < 10 ? '0' + m : m);
-                    var start = h + ':' + m;
-
-                    h = end_time.getHours();
-                    m = end_time.getMinutes();
-                    m = (m < 10 ? '0' + m : m);
-                    var end = h + ':' + m;
-
-                    text = start + ' til ' + end;
-                }
-
-                var rectWidth = context.measureText(text).width + 10;
-                var rectHeight = 25;
-                var rectX = this.tt.x - (rectWidth) - 2;
-                var rectY = this.tt.y - (rectHeight);
-                var radius = 5;
-                var text_x = rectX + 5;
-                var text_y = rectHeight + rectY - (this.settings.card.label.size / 2) - 2;
-
-                context.fillStyle = 'rgba(0, 0, 0, .5)';
-                context.strokeStyle = 'rgba(0, 0, 0, 1)';
-                context.lineWidth = 1;
-                context.beginPath();
-                context.moveTo(rectX + radius, rectY);
-                context.lineTo(rectX + rectWidth - radius, rectY);
-                context.quadraticCurveTo(rectX + rectWidth, rectY, rectX + rectWidth, rectY + radius);
-                context.lineTo(rectX + rectWidth, rectY + rectHeight - radius);
-                context.quadraticCurveTo(rectX + rectWidth, rectY + rectHeight, rectX + rectWidth - radius, rectY + rectHeight);
-                context.lineTo(rectX + radius, rectY + rectHeight);
-                context.quadraticCurveTo(rectX, rectY + rectHeight, rectX, rectY + rectHeight - radius);
-                context.lineTo(rectX, rectY + radius);
-                context.quadraticCurveTo(rectX, rectY, rectX + radius, rectY);
-                context.closePath();
-                context.stroke();
-                context.fill();
-                context.beginPath();
-                context.font = this.settings.card.label.size + 'pt Calibri';
-                context.fillStyle = 'rgba(255, 255, 255, 1)';
-                context.fillText(text, text_x, text_y);
-                context.closePath();
             }
             context.restore();
         },
@@ -712,6 +719,10 @@
             this.cards = [];
             this.height = undefined;
             this.load(data);
+            this.reDraw();
+        },
+        filter: function(data) {
+            this.filterItem = data;
             this.reDraw();
         }
     };
