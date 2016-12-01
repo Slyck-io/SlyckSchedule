@@ -2,13 +2,22 @@
 
 <head>
     <title>Much Developmenet</title>
-    <link rel="stylesheet" type="text/css" href="/dist/slyckSchedule.min.css">
-    <script src="/dist/slyckSchedule.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/dist/slyckSchedule.css">
+    <script src="/dist/slyckSchedule.js"></script>
 </head>
 
 <body>
     <slyck-schedule></slyck-schedule>
-    <button onclick="update()">Update with Top Schedule with new Data</button>
+    <button onclick="update()">Update with new Data</button>
+    <br />
+    Filter: 
+    <select id="filter" onchange="filter()">
+        <option value="All">All</option>
+        <option value="Ray">Ray</option>
+        <option value="Bill">Bill</option>
+        <option value="Bob">Bob</option>
+        <option value="Frank">Frank</option>
+    </select>
     <script>
     var data = [{
         name: 'Ray',
@@ -126,7 +135,13 @@
             endTime: '1479845124' // 2000 Local
         }];
         schedule1.update(data1);
-    }
+    };
+
+    var filter = function() {
+    	  var e = document.getElementById("filter");
+				var label = e.options[e.selectedIndex].value;
+        schedule1.filter(label);
+    };
     </script>
 </body>
 

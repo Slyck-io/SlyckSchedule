@@ -44,7 +44,7 @@ module.exports = function(grunt) {
                 // to watch Javascript and CSS files too.
                 files: ['index.html', '**/*.js', '**/*.js'],
                 // This configures the task that will run when the file change
-                tasks: ['livereload', 'build']
+                tasks: ['livereload', 'default']
             }
         },
         uglify: {
