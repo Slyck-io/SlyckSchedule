@@ -9,8 +9,7 @@
 <body>
     <slyck-schedule></slyck-schedule>
     <button onclick="update()">Update with new Data</button>
-    <br />
-    Filter: 
+    <br /> Filter:
     <select id="filter" onchange="filter()">
         <option value="All">All</option>
         <option value="Ray">Ray</option>
@@ -115,7 +114,43 @@
             }
         },
         card: {
-        	size: 30
+            //onClick: alertMe,
+            size: 20,
+            space: 2,
+            label: {
+                size: 10,
+                color: [45, 49, 66, 1]
+            },
+            random: true,
+            colors: [
+                ['#73C6B6'],
+                ['#82E0AA'],
+                ['#F5B7B1'],
+                ['#57A3F6'],
+                ['#D133B0'],
+                ['#1CE796'],
+                ['#827DF5'],
+                ['#B6134F'],
+                ['#6A61D6'],
+                ['#8A8BE3'],
+                ['#C00A79'],
+                ['#10B8DA'],
+                ['#E90FC5'],
+                ['#E3F55D'],
+                ['#CD8487'],
+                ['#8578FE'],
+                ['#21ED9C'],
+                ['#875971'],
+                ['#E64EB9']
+            ]
+        },
+        graph: {
+            font: {
+                size: 8
+            },
+            time: {
+                format: '24'
+            }
         }
     });
 
@@ -144,8 +179,8 @@
     };
 
     var filter = function() {
-    	  var e = document.getElementById("filter");
-				var label = e.options[e.selectedIndex].value;
+        var e = document.getElementById("filter");
+        var label = e.options[e.selectedIndex].value;
         schedule1.filter(label);
     };
     </script>
