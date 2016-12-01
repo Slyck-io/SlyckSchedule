@@ -1,7 +1,133 @@
 <html>
-	<head>
-	</head>
-	<body>
-		Hello
-	</body>
+
+<head>
+    <title>Much Developmenet</title>
+    <link rel="stylesheet" type="text/css" href="/dist/slyckSchedule.min.css">
+    <script src="/dist/slyckSchedule.min.js"></script>
+</head>
+
+<body>
+    <slyck-schedule></slyck-schedule>
+    <button onclick="update()">Update with Top Schedule with new Data</button>
+    <script>
+    var data = [{
+        name: 'Ray',
+        startTime: '1479837924', //1800 Local
+        endTime: '1479845124' // 2000 Local
+    }, {
+        name: 'Bob',
+        startTime: '1479794724', //0600 Local
+        endTime: '1479816324', //1200 GMT
+    }, {
+        name: 'Bill',
+        startTime: '1479794724', //0600 Local
+        endTime: '1479805524' //0900 Local
+    }, {
+        name: 'Steve',
+        startTime: '1479794724', //0600 Local
+        endTime: '1479845124' // 2000 Local
+    }, {
+        name: 'Frank',
+        startTime: '1479837924', //1800 Local
+        endTime: '1479845124' // 2000 Local
+    }, {
+        name: 'Ray',
+        startTime: '1479837924', //1800 Local
+        endTime: '1479845124' // 2000 Local
+    }, {
+        name: 'Bob',
+        startTime: '1479794724', //0600 Local
+        endTime: '1479816324', //1200 GMT
+    }, {
+        name: 'Bill',
+        startTime: '1479794724', //0600 Local
+        endTime: '1479805524' //0900 Local
+    }, {
+        name: 'Steve',
+        startTime: '1479794724', //0600 Local
+        endTime: '1479845124' // 2000 Local
+    }, {
+        name: 'Frank',
+        startTime: '1479837924', //1800 Local
+        endTime: '1479845124' // 2000 Local
+    }, {
+        name: 'Ray',
+        startTime: '1479837924', //1800 Local
+        endTime: '1479845124' // 2000 Local
+    }, {
+        name: 'Bob',
+        startTime: '1479794724', //0600 Local
+        endTime: '1479816324', //1200 GMT
+    }, {
+        name: 'Bill',
+        startTime: '1479794724', //0600 Local
+        endTime: '1479805524' //0900 Local
+    }, {
+        name: 'Steve',
+        startTime: '1479794724', //0600 Local
+        endTime: '1479845124' // 2000 Local
+    }, {
+        name: 'Frank',
+        startTime: '1479837924', //1800 Local
+        endTime: '1479845124' // 2000 Local
+    }, {
+        name: 'Ray',
+        startTime: '1479837924', //1800 Local
+        endTime: '1479845124' // 2000 Local
+    }, {
+        name: 'Bob',
+        startTime: '1479794724', //0600 Local
+        endTime: '1479816324', //1200 GMT
+    }, {
+        name: 'Bill',
+        startTime: '1479794724', //0600 Local
+        endTime: '1479805524' //0900 Local
+    }, {
+        name: 'Steve',
+        startTime: '1479794724', //0600 Local
+        endTime: '1479845124' // 2000 Local
+    }, {
+        name: 'Frank',
+        startTime: '1479837924', //1800 Local
+        endTime: '1479845124' // 2000 Local
+    }];
+
+    var alertMe = function(data) {
+        alert('You clicked\n' + JSON.stringify(data));
+    }
+
+    var schedule1 = new SlyckSchedule(data, {
+        data: {
+            label: 'name',
+            time: {
+                start: 'startTime',
+                end: 'endTime'
+            }
+        },
+        debug: true
+    });
+
+    var update = function() {
+        var data1 = [{
+            name: 'Ray',
+            startTime: '1479837924', //1800 Local
+            endTime: '1479845124' // 2000 Local
+        }, {
+            name: 'Bob',
+            startTime: '1479794724', //0600 Local
+            endTime: '1479816324', //1200 GMT
+        }, {
+            name: 'Steve',
+            startTime: '1479794724', //0600 Local
+            endTime: '1479845124' // 2000 Local
+        }, {
+            name: 'Frank',
+            startTime: '1479837924', //1800 Local
+            endTime: '1479845124' // 2000 Local
+        }];
+        schedule1.update(data1);
+    }
+    </script>
+</body>
+
 </html>
