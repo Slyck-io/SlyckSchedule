@@ -26,13 +26,18 @@
   },
   "homepage": "https://github.com/Slyck-io/SlyckSchedule",
   "devDependencies": {
-    "grunt": "^1.0.1",
     "grunt-autoprefixer": "^3.0.4",
     "grunt-bump": "^0.8.0",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-cssmin": "^1.0.2",
     "grunt-contrib-less": "^1.4.0",
     "grunt-contrib-uglify": "^2.0.0",
-    "grunt-contrib-watch": "^1.0.0"
+    "grunt-contrib-watch": "^1.0.0",
+    "matchdep": "~0.1.1",
+    "grunt": "~0.4.0",
+    "grunt-regarde": "~0.1.1",
+    "grunt-contrib-connect":  "0.1.2",
+    "grunt-contrib-livereload": "0.1.1",
+    "grunt-open": "~0.2.0"
   }
 }
