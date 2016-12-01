@@ -182,6 +182,16 @@
             this.slyck.appendChild(this.canvas);
             this.checkColors();
 
+            self.canvasCard = document.createElement("canvas");
+            self.contextCard = self.canvasCard.getContext("2d");
+            this.canvasCard.id = "cards";
+            this.marginLeft = -((this.width / 2) - (this.slyck.offsetWidth / 2));
+            this.canvasCard.style.display = 'inline-block';
+            this.canvasCard.style.position = 'absolute';
+            this.canvasCard.style.pointerEvents = 'none';
+            this.canvasCard.style.marginLeft = self.marginLeft + "px";
+            this.slyck.appendChild(this.canvasCard);
+
             if (this.settings.graph.time.format == '24') {
                 this.settings.graph.time.format = 0;
             } else if (this.settings.graph.time.format == '12') {
@@ -224,6 +234,7 @@
                     if (self.marginLeft > 0) self.marginLeft = 0;
                     if (self.marginLeft < (self.slyck.offsetWidth - self.width)) self.marginLeft = self.slyck.offsetWidth - self.width;
                     self.canvas.style.marginLeft = self.marginLeft + "px";
+                    self.canvasCard.style.marginLeft = self.marginLeft + "px";
                 }
                 e.preventDefault();
             }, false);
@@ -518,6 +529,10 @@
             if (typeof this.height == 'undefined') this.height = this.rows.length + ((this.rows.length + 2) * this.settings.card.size) + ((this.rows.length) * this.settings.card.space) + this.settings.card.space + (this.settings.graph.font.size + 4);
 
             this.canvas.height = this.height;
+            this.canvasCard.style.marginTop = '-'+this.canvas.height+'px';
+
+            this.canvasCard.width = this.canvas.width;
+            this.canvasCard.height = this.canvas.height;
 
             var container = this.slyck.getElementsByClassName("slyck-schedule-ui")[0];
             if (container) this.slyck.removeChild(container);
@@ -708,15 +723,15 @@
             context.fillText(card.values.label, text_x, text_y);
             context.closePath();
         },
-        clear: function() {
-            this.context.save();
-            this.context.setTransform(1, 0, 0, 1, 0, 0);
-            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            this.context.restore();
+        clear: function(ctx) {
+            ctx.save();
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            ctx.restore();
         },
         reDraw: function() {
             this.height = undefined;
-            this.clear();
+            this.clear(this.context);
             this.layout();
             this.draw();
         },
@@ -728,6 +743,16 @@
             this.load(data);
             this.reDraw();
         },
+        /**
+         *  filter
+         *
+         *  Takes in a label to filter, creats a backup of rows and resets the rows and cards, 
+         *  then sets status to load for the animation.
+         *  Then the function calls load to reload using the current data and calls reDraw 
+         *  to re draw the canvas.
+         * 
+         *  @params   data  The label you want to filter.
+         */
         filter: function(data) {
             this.filterItem = data;
             this.status = 'load';
@@ -746,9 +771,8 @@
             }
         },
         cardLoadAnimation: function() {
-            this.clear();
-            this.layout();
-            var context = this.context;
+            this.clear(this.contextCard);
+            var context = this.contextCard;
             this.count.stroke = 0;
             this.count.fill = 0;
             context.save();
