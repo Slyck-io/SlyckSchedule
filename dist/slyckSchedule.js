@@ -18,7 +18,6 @@
             self.height = undefined;
             self.current = undefined;
             self.filterItem = 'All';
-            self.filterItemLast = 'All';
             self.status = undefined;
             self.tt = {
                 x: 0,
@@ -26,7 +25,6 @@
             };
             self.cards = [];
             self.rows = [];
-            self.tempCards = [];
             self.backup = [];
             self.scale = {
                 x: 0,
@@ -146,10 +144,6 @@
             return this;
         };
 
-    /**
-     * Main prototype
-     * @type {Object}
-     */
     Protected.prototype = {
         init: function() {
             var self = this;
@@ -510,7 +504,6 @@
 
                     rows[hor_index].push({ start: start_pos, end: end_pos, card: card });
                     this.cards.push(card);
-                    this.tempCards.push(card);
                 }
             }
             this.rows = rows;
@@ -628,8 +621,8 @@
         },
         draw: function() {
             if (typeof this.status != 'undefined' && this.status == 'load') {
-              this.loadAnimation(this.reDraw, 'cards', this.settings.card.size);
-              return;
+                this.loadAnimation(this.reDraw, 'cards', this.settings.card.size);
+                return;
             }
 
             var context = this.context;
@@ -736,12 +729,11 @@
             this.reDraw();
         },
         filter: function(data) {
+            this.filterItem = data;
+            this.status = 'load';
             this.backup = this.rows;
             this.rows = [];
             this.cards = [];
-            this.filterItemLast = this.filterItem;
-            this.filterItem = data;
-            this.status = (this.filterItemLast != 'All' && this.filer != 'All' ? 'load' : 'move');
             this.load(this.data);
             this.reDraw();
         },
@@ -754,6 +746,8 @@
             }
         },
         cardLoadAnimation: function() {
+            this.clear();
+            this.layout();
             var context = this.context;
             this.count.stroke = 0;
             this.count.fill = 0;
@@ -781,6 +775,8 @@
                 window.requestAnimationFrame(this.cardLoadAnimation);
             } else {
                 this.status = undefined;
+                this.animationSettings = undefined;
+                this.animationSettingsDefaults = undefined;
                 this.callback();
             }
         }
