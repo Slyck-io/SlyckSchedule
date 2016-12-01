@@ -435,14 +435,16 @@
                 return;
             }
         },
-        Card: function(x, y, height, width, values, data) {
+        Card: function(x, y, height, width, values, data, stroke, fill) {
             return {
                 left: x,
                 top: y,
                 right: x + height,
                 bottom: y + width,
                 values: values,
-                data: data
+                data: data,
+                stroke: stroke,
+                fill: fill
             };
         },
         getOffset: function(index) {
@@ -461,6 +463,8 @@
         load: function(data) {
             var rows = this.rows;
             var values;
+            this.count.stroke = 0;
+            this.count.fill = 0;
             for (var i = 0; i < data.length; i++) {
                 values = this.getValues(data[i]);
                 if (this.filterItem == 'All' || values.label == this.filterItem) {
@@ -510,10 +514,22 @@
 
                     if (!rows[hor_index]) rows.push(new Array());
 
-                    var card = this.Card(start_pos, this.getOffset(hor_index) + (hor_index * this.settings.card.size), end_pos - start_pos, this.settings.card.size, values, data[i]);
+                    var card = this.Card(
+                      start_pos, //x
+                      this.getOffset(hor_index) + (hor_index * this.settings.card.size), //y
+                      end_pos - start_pos, //height
+                      this.settings.card.size,  //width
+                      values, //values
+                      data[i], //data
+                      ((this.settings.card.strokes.length > 1) ? this.getCardColor(this.count.stroke, 'stroke') : this.getCardColor(0, 'stroke')), //stroke
+                      ((this.settings.card.colors.length > 1) ? this.getCardColor(this.count.fill, 'fill') : this.getCardColor(0, 'fill')) //fill
+                      );
 
                     rows[hor_index].push({ start: start_pos, end: end_pos, card: card });
                     this.cards.push(card);
+
+                    this.count.stroke = (this.count.stroke + 1) % this.settings.card.strokes.length;
+                    this.count.fill = (this.count.fill + 1) % this.settings.card.colors.length;
                 }
             }
             this.rows = rows;
@@ -528,7 +544,7 @@
             if (typeof this.height == 'undefined') this.height = this.rows.length + ((this.rows.length + 2) * this.settings.card.size) + ((this.rows.length) * this.settings.card.space) + this.settings.card.space + (this.settings.graph.font.size + 4);
 
             this.canvas.height = this.height;
-            this.canvasCard.style.marginTop = '-'+this.canvas.height+'px';
+            this.canvasCard.style.marginTop = '-' + this.canvas.height + 'px';
 
             this.canvasCard.width = this.canvas.width;
             this.canvasCard.height = this.canvas.height;
@@ -698,9 +714,9 @@
             context.beginPath();
             context.rect(card.left, offset + (index * this.settings.card.size), (card.right - card.left), this.settings.card.size);
             context.lineWidth = 1;
-            context.strokeStyle = ((this.settings.card.strokes.length > 1) ? this.getCardColor(this.count.stroke, 'stroke') : this.getCardColor(0, 'stroke'));
+            context.strokeStyle = card.stroke;
             context.stroke();
-            context.fillStyle = ((this.settings.card.colors.length > 1) ? this.getCardColor(this.count.fill, 'fill') : this.getCardColor(0, 'fill'));
+            context.fillStyle = card.fill;
             context.fill();
             context.closePath();
 
@@ -714,7 +730,7 @@
                     console.error('Label width then or equal to card width or within 5');
                 }
                 this.settings.card.label.size -= 5;
-                this.redraw();
+                this.reDraw();
             }
 
             text_x = ((card.right - card.left) / 2) + card.left - (context.measureText(card.values.label).width / 2);
@@ -773,8 +789,6 @@
         cardLoadAnimation: function() {
             this.clear(this.contextCard);
             var context = this.contextCard;
-            this.count.stroke = 0;
-            this.count.fill = 0;
             context.save();
             for (var i = 0; i < this.rows.length; i++) {
                 for (var j = 0; j < this.rows[i].length; j++) {
@@ -782,14 +796,11 @@
                     context.beginPath();
                     context.rect(this.rows[i][j].card.left, offset + (i * this.settings.card.size), (this.rows[i][j].card.right - this.rows[i][j].card.left), this.animationSettingsDefaults);
                     context.lineWidth = 1;
-                    context.strokeStyle = ((this.settings.card.strokes.length > 1) ? this.getCardColor(this.count.stroke, 'stroke') : this.getCardColor(0, 'stroke'));
+                    context.strokeStyle = this.rows[i][j].card.stroke;
                     context.stroke();
-                    context.fillStyle = ((this.settings.card.colors.length > 1) ? this.getCardColor(this.count.fill, 'fill') : this.getCardColor(0, 'fill'));
+                    context.fillStyle = this.rows[i][j].card.fill;
                     context.fill();
                     context.closePath();
-
-                    this.count.stroke = (this.count.stroke + 1) % this.settings.card.strokes.length;
-                    this.count.fill = (this.count.fill + 1) % this.settings.card.colors.length;
                     // current value + 1 % array_length gives back the next value but once it hits the last element it returns to 0
                 }
             }
