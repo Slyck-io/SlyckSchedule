@@ -1,3 +1,20 @@
+<a name="3.0.0"></a>
+### 3.0.0 (11-31-2016)
+
+#### Features
+
+* Add filtering of labels ([#10](https://github.com/Slyck-io/SlyckSchedule/pull/10))
+* Add Card loading animation ([#14](https://github.com/Slyck-io/SlyckSchedule/pull/14))
+* Add Grunt Serve ([#6](https://github.com/Slyck-io/SlyckSchedule/pull/6))
+
+#### Enhancements
+
+* Schedule now compresses on filter change ([#13](https://github.com/Slyck-io/SlyckSchedule/pull/13))
+
+#### Bugs Fixed
+
+* Fixed schedule height not changing after data update ([#9](https://github.com/Slyck-io/SlyckSchedule/pull/9))
+
 <a name="1.0.1"></a>
 ### 1.0.1 (11-28-2016)
 
