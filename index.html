@@ -114,9 +114,13 @@
                 end: 'endTime'
             }
         },
-        debug: true
+        card: {
+        	size: 30
+        }
     });
 
+
+    var current = data;
     var update = function() {
         var data1 = [{
             name: 'Ray',
@@ -135,7 +139,8 @@
             startTime: '1479837924', //1800 Local
             endTime: '1479845124' // 2000 Local
         }];
-        schedule1.update(data1);
+        current = (current == data ? data1 : data);
+        schedule1.update(current);
     };
 
     var filter = function() {

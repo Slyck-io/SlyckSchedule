@@ -18,6 +18,7 @@
             self.height = undefined;
             self.current = undefined;
             self.filterItem = 'All';
+            self.status = undefined;
             self.tt = {
                 x: 0,
                 y: 0
@@ -143,10 +144,6 @@
             return this;
         };
 
-    /**
-     * Main prototype
-     * @type {Object}
-     */
     Protected.prototype = {
         init: function() {
             var self = this;
@@ -185,6 +182,15 @@
             this.slyck.appendChild(this.canvas);
             this.checkColors();
 
+            self.canvasCard = document.createElement("canvas");
+            self.contextCard = self.canvasCard.getContext("2d");
+            this.canvasCard.id = "cards";
+            this.marginLeft = -((this.width / 2) - (this.slyck.offsetWidth / 2));
+            this.canvasCard.style.display = 'inline-block';
+            this.canvasCard.style.pointerEvents = 'none';
+            this.canvasCard.style.marginLeft = self.marginLeft + "px";
+            this.slyck.appendChild(this.canvasCard);
+
             if (this.settings.graph.time.format == '24') {
                 this.settings.graph.time.format = 0;
             } else if (this.settings.graph.time.format == '12') {
@@ -201,6 +207,7 @@
             this.draw = this.draw.bind(this);
             this.clear = this.clear.bind(this);
             this.reDraw = this.reDraw.bind(this);
+            this.cardLoadAnimation = this.cardLoadAnimation.bind(this);
 
             window.addEventListener('resize', self.reDraw, false);
 
@@ -226,6 +233,7 @@
                     if (self.marginLeft > 0) self.marginLeft = 0;
                     if (self.marginLeft < (self.slyck.offsetWidth - self.width)) self.marginLeft = self.slyck.offsetWidth - self.width;
                     self.canvas.style.marginLeft = self.marginLeft + "px";
+                    self.canvasCard.style.marginLeft = self.marginLeft + "px";
                 }
                 e.preventDefault();
             }, false);
@@ -292,6 +300,7 @@
                 click = true;
             }, false);
 
+            self.status = 'load';
             self.load(self.data);
             self.layout();
             self.draw();
@@ -519,6 +528,10 @@
             if (typeof this.height == 'undefined') this.height = this.rows.length + ((this.rows.length + 2) * this.settings.card.size) + ((this.rows.length) * this.settings.card.space) + this.settings.card.space + (this.settings.graph.font.size + 4);
 
             this.canvas.height = this.height;
+            this.canvasCard.style.marginTop = '-'+this.canvas.height+'px';
+
+            this.canvasCard.width = this.canvas.width;
+            this.canvasCard.height = this.canvas.height;
 
             var container = this.slyck.getElementsByClassName("slyck-schedule-ui")[0];
             if (container) this.slyck.removeChild(container);
@@ -585,7 +598,47 @@
 
             context.restore();
         },
+        formatTime: function(start_time, end_time) {
+            var text;
+            if (this.settings.graph.time.format == 0) {
+                var h = start_time.getHours();
+                var m = start_time.getMinutes();
+                m = (m < 10 ? '0' + m : m);
+                var time = (h <= 12 ? 'am' : 'pm');
+                if (time == 'pm') h -= 12;
+                var start = h + ':' + m + ' ' + time;
+
+                h = end_time.getHours();
+                m = end_time.getMinutes();
+                m = (m < 10 ? '0' + m : m);
+                time = (h <= 12 ? 'am' : 'pm');
+                if (time == 'pm') h -= 12;
+                var end = h + ':' + m + ' ' + time;
+
+                text = start + ' til ' + end;
+            }
+            if (this.settings.graph.time.format == 1) {
+                var h = start_time.getHours();
+                var m = start_time.getMinutes();
+                m = (m < 10 ? '0' + m : m);
+                var start = h + ':' + m;
+
+                h = end_time.getHours();
+                m = end_time.getMinutes();
+                m = (m < 10 ? '0' + m : m);
+                var end = h + ':' + m;
+
+                text = start + ' til ' + end;
+            }
+
+            return text;
+        },
         draw: function() {
+            if (typeof this.status != 'undefined' && this.status == 'load') {
+                this.loadAnimation(this.reDraw, 'cards', this.settings.card.size);
+                return;
+            }
+
             var context = this.context;
             this.count.stroke = 0;
             this.count.fill = 0;
@@ -601,37 +654,7 @@
             if (this.settings.card.tooltip && typeof this.current != 'undefined') {
                 var start_time = new Date((this.current.values.start * 1000) + (new Date().getTimezoneOffset() * 60000));
                 var end_time = new Date((this.current.values.end * 1000) + (new Date().getTimezoneOffset() * 60000));
-                var text;
-                if (this.settings.graph.time.format == 0) {
-                    var h = start_time.getHours();
-                    var m = start_time.getMinutes();
-                    m = (m < 10 ? '0' + m : m);
-                    var time = (h <= 12 ? 'am' : 'pm');
-                    if (time == 'pm') h -= 12;
-                    var start = h + ':' + m + ' ' + time;
-
-                    h = end_time.getHours();
-                    m = end_time.getMinutes();
-                    m = (m < 10 ? '0' + m : m);
-                    time = (h <= 12 ? 'am' : 'pm');
-                    if (time == 'pm') h -= 12;
-                    var end = h + ':' + m + ' ' + time;
-
-                    text = start + ' til ' + end;
-                }
-                if (this.settings.graph.time.format == 1) {
-                    var h = start_time.getHours();
-                    var m = start_time.getMinutes();
-                    m = (m < 10 ? '0' + m : m);
-                    var start = h + ':' + m;
-
-                    h = end_time.getHours();
-                    m = end_time.getMinutes();
-                    m = (m < 10 ? '0' + m : m);
-                    var end = h + ':' + m;
-
-                    text = start + ' til ' + end;
-                }
+                var text = this.formatTime(start_time, end_time);
 
                 var rectWidth = context.measureText(text).width + 10;
                 var rectHeight = 25;
@@ -664,6 +687,7 @@
                 context.closePath();
             }
             context.restore();
+            this.clear(this.contextCard);
         },
         drawCard: function(card, index) {
             var context = this.context;
@@ -699,15 +723,15 @@
             context.fillText(card.values.label, text_x, text_y);
             context.closePath();
         },
-        clear: function() {
-            this.context.save();
-            this.context.setTransform(1, 0, 0, 1, 0, 0);
-            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            this.context.restore();
+        clear: function(ctx) {
+            ctx.save();
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            ctx.restore();
         },
         reDraw: function() {
             this.height = undefined;
-            this.clear();
+            this.clear(this.context);
             this.layout();
             this.draw();
         },
@@ -715,16 +739,70 @@
             this.data = data;
             this.rows = [];
             this.cards = [];
+            this.status = 'load';
             this.load(data);
             this.reDraw();
         },
+        /**
+         *  filter
+         *
+         *  Takes in a label to filter, creats a backup of rows and resets the rows and cards, 
+         *  then sets status to load for the animation.
+         *  Then the function calls load to reload using the current data and calls reDraw 
+         *  to re draw the canvas.
+         * 
+         *  @params   data  The label you want to filter.
+         */
         filter: function(data) {
+            this.filterItem = data;
+            this.status = 'load';
             this.backup = this.rows;
             this.rows = [];
             this.cards = [];
-            this.filterItem = data;
             this.load(this.data);
             this.reDraw();
+        },
+        loadAnimation: function(callback, object, params) {
+            this.animationSettings = params;
+            this.animationSettingsDefaults = 0;
+            this.callback = callback;
+            if (typeof object != 'undefined' && object == 'cards') {
+                window.requestAnimationFrame(this.cardLoadAnimation);
+            }
+        },
+        cardLoadAnimation: function() {
+            this.clear(this.contextCard);
+            var context = this.contextCard;
+            this.count.stroke = 0;
+            this.count.fill = 0;
+            context.save();
+            for (var i = 0; i < this.rows.length; i++) {
+                for (var j = 0; j < this.rows[i].length; j++) {
+                    var offset = this.getOffset(i);
+                    context.beginPath();
+                    context.rect(this.rows[i][j].card.left, offset + (i * this.settings.card.size), (this.rows[i][j].card.right - this.rows[i][j].card.left), this.animationSettingsDefaults);
+                    context.lineWidth = 1;
+                    context.strokeStyle = ((this.settings.card.strokes.length > 1) ? this.getCardColor(this.count.stroke, 'stroke') : this.getCardColor(0, 'stroke'));
+                    context.stroke();
+                    context.fillStyle = ((this.settings.card.colors.length > 1) ? this.getCardColor(this.count.fill, 'fill') : this.getCardColor(0, 'fill'));
+                    context.fill();
+                    context.closePath();
+
+                    this.count.stroke = (this.count.stroke + 1) % this.settings.card.strokes.length;
+                    this.count.fill = (this.count.fill + 1) % this.settings.card.colors.length;
+                    // current value + 1 % array_length gives back the next value but once it hits the last element it returns to 0
+                }
+            }
+            context.restore();
+            this.animationSettingsDefaults++;
+            if ((this.animationSettings - this.animationSettingsDefaults) != 1) {
+                window.requestAnimationFrame(this.cardLoadAnimation);
+            } else {
+                this.status = undefined;
+                this.animationSettings = undefined;
+                this.animationSettingsDefaults = undefined;
+                this.callback();
+            }
         }
     };
 
