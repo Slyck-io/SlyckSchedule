@@ -194,6 +194,20 @@
             this.slyck.appendChild(self.canvas);
             //End Create Canvas
 
+            //Start Check Time Format
+            if (this.settings.graph.time.format == '12') {
+                this.settings.graph.time.format = 0;
+            } else if (this.settings.graph.time.format == '24') {
+                this.settings.graph.time.format = 1;
+            } else {
+                if (self.settings.debug) {
+                    console.error('Unsupport Time Formatting');
+                    console.info('12 = 12 Hours AM/PM or 24 = 24 Hours 0000-2300');
+                }
+                return;
+            }
+            //End Check Time Format
+
             //Load Data
             this.load(this.data);
 
@@ -396,7 +410,7 @@
                     data[a], //data
                     values, //values
                     index, // row
-                    1, //time
+                    this.settings.graph.time.format, //time
                     fill, //Fill Color
                     stroke //Stroke Color
                 );
@@ -430,7 +444,7 @@
                 this.width, //width
                 this.height, //height
                 this.interval, //interval for hours 
-                1 //1 = 24hrs | 0 = 12hrs
+                this.settings.graph.time.format //1 = 24hrs | 0 = 12hrs
             );
             //End Graph
         },
@@ -614,8 +628,8 @@
         this.interval = interval;
         this.context;
         this.hours = [
-            ['00:00', '01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'],
-            ['12:00 AM', '1:00 AM', '2:00 AM', '3:00 AM', '4:00 AM', '5:00 AM', '6:00 AM', '7:00 AM', '8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM', '12:00 AM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM', '6:00 PM', '7:00 PM', '8:00 PM', '9:00 PM', '10:00 PM', '12:00 PM']
+            ['12:00 AM', '1:00 AM', '2:00 AM', '3:00 AM', '4:00 AM', '5:00 AM', '6:00 AM', '7:00 AM', '8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM', '12:00 AM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM', '6:00 PM', '7:00 PM', '8:00 PM', '9:00 PM', '10:00 PM', '12:00 PM'],
+            ['00:00', '01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00']
         ];
 
         this.show = function() {
@@ -643,7 +657,7 @@
                 this.context.beginPath();
                 this.context.font = 'italic 10pt Calibri'; //10 = Font Size
                 this.context.fillStyle = 'rgba(45, 49, 66, 1)'; //Time Label Color
-                this.context.fillText(this.hours[0][i], (pos - (this.context.measureText(this.hours[0][i]).width / 2)), this.height - 2); //Push text away from bottom
+                this.context.fillText(this.hours[this.timeFormat][i], (pos - (this.context.measureText(this.hours[this.timeFormat][i]).width / 2)), this.height - 2); //Push text away from bottom
                 this.context.closePath();
 
                 pos += this.interval;
