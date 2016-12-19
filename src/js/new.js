@@ -215,11 +215,10 @@
                         return;
                     }
 
+                    var container = self.slyck.getBoundingClientRect();
                     var rect = self.canvas.getBoundingClientRect();
                     var clickedX = event.pageX - rect.left - window.scrollX;
                     var clickedY = event.pageY - rect.top - window.scrollY;
-                    var scaleX = (self.scale.x != 0 ? self.scale.x : 1);
-                    var scaleY = (self.scale.y != 0 ? self.scale.y : 1);
 
                     for (var i = 0; i < self.cards.length; i++) {
                         if (clickedX < (self.cards[i].right) &&
@@ -237,21 +236,28 @@
             //End Event Listeners
         },
         load: function(data) {
+            var temp = [];
+            temp = this.cards;
             this.cards = [];
             var rows = 0;
-            for (var i in data) {
+            for (var a in data) {
                 var fill;
                 var stroke;
-                var values = this.getValues(data[i]);
+                var values = this.getValues(data[a]);
                 var start_time = new Date((values.start * 1000) + (new Date().getTimezoneOffset() * 60000));
                 var end_time = new Date((values.end * 1000) + (new Date().getTimezoneOffset() * 60000));
                 var start_pos = (start_time.getHours() * this.interval) + this.interval + start_time.getMinutes();
                 var end_pos = (end_time.getHours() * this.interval) + this.interval + end_time.getMinutes();
-                var index = this.cards.findIndex(x => x.values.label === values.label);
+                var index = -1;
+                var row;
+                var indexs = [];
 
-                if (index >= 0) {
-                    fill = this.cards[index].fill;
-                    stroke = this.cards[index].stroke;
+                for(var i in this.cards) {
+                    if (this.cards[i].values.label == values.label) indexs.push(i);
+                }
+
+                if(indexs.length > 0) {
+                    index = indexs[0];
                 }
 
                 if (index < 0) {
@@ -263,7 +269,38 @@
                     stroke = r+', '+g+', '+b;
                 }
 
-                if (index < 0 || (start_pos >= this.cards[index].left && start_pos <= this.cards[index].right)) {
+                if (index >= 0) {
+                    fill = this.cards[index].fill;
+                    stroke = this.cards[index].stroke;
+                }
+
+                if (temp.length != 0) {
+                    var t = temp.findIndex(x => x.values.label === values.label);
+                    if(t >= 0) {
+                        fill = temp[t].fill;
+                        stroke = temp[t].stroke;
+                    }
+                }
+
+                if(indexs.length > 0) {
+                    var row;
+                    var checked = [];
+
+                    for(var i = 0; i < indexs.length; i++) {
+                        row = this.cards[indexs[i]].row - 1;
+       
+                        if(checked.indexOf(row) < 0) { 
+                            checked.push(row);
+                            if ((start_pos >= this.cards[indexs[i]].left && start_pos <= this.cards[indexs[i]].right)) {
+                                index = -1;
+                            } else {
+                                index = row;
+                            }
+                        }
+                    }
+                }
+                
+                if (index < 0) {
                     index = rows + 1;
                     rows++;
                 } else {
@@ -278,8 +315,9 @@
                     pos, //Top
                     (pos + this.settings.card.size), //Bottom
                     this.settings.card.size, //size
-                    data[i], //data
+                    data[a], //data
                     values, //values
+                    index, // row
                     1, //time
                     fill, //Fill Color
                     stroke //Stroke Color
@@ -288,12 +326,14 @@
                 this.cards.push(card); //add card to card array
             }
 
+            this.rows = rows;
+
             //Start setup
             this.setup();
         },
         setup: function() {
-            var count = this.cards.length + 2;
-            this.height =  (count * this.settings.card.size) + (count * (this.settings.card.space * 2));
+            var count = this.rows + 2;
+            this.height =  (count * this.settings.card.size) + ((count+2) * (this.settings.card.space * 2));
 
             //Start Setup DOM Elements
             var container = this.slyck.getElementsByClassName("slyck-schedule-ui")[0];
@@ -363,7 +403,7 @@
         }
     };
 
-    function Card(left, right, top, bottom, size, data, values, time, fill, stroke) {
+    function Card(left, right, top, bottom, size, data, values, row, time, fill, stroke) {
         this.canvas = document.getElementById("schedule");
         this.context = this.canvas.getContext("2d");
         this.left = left;
@@ -373,6 +413,7 @@
         this.size = size;
         this.data = data;
         this.values = values;
+        this.row = row;
         this.fill = fill;
         this.stroke = stroke;
         this.time = time;
