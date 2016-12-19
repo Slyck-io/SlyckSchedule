@@ -309,6 +309,7 @@
             this.cards = [];
             var rows = 0;
             for (var a in data) {
+                //data[a] = data[a][0] // temp data
                 var fill;
                 var stroke;
                 var values = this.getValues(data[a]);
@@ -365,7 +366,10 @@
 
                         if (checked.indexOf(row) < 0) {
                             checked.push(row);
-                            if ((start_pos >= this.cards[indexs[i]].left && start_pos <= this.cards[indexs[i]].right)) {
+                            if (
+                                (end_pos <= this.cards[indexs[i]].left && end_pos >= this.cards[indexs[i]].right) ||
+                                (start_pos >= this.cards[indexs[i]].left && start_pos <= this.cards[indexs[i]].right)
+                                ) {
                                 index = -1;
                             } else {
                                 index = row;
@@ -468,6 +472,7 @@
         getValues: function(data) {
             var values = {};
             for (var a in data) {
+                //if (a == this.settings.data.label.split(".")[0]) values.label = data[a].FirstName //temp
                 if (a == this.settings.data.label) values.label = data[a];
                 if (a == this.settings.data.time.start) values.start = data[a];
                 if (a == this.settings.data.time.end) values.end = data[a];
