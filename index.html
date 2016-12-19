@@ -3,7 +3,7 @@
 <head>
     <title>Much Developmenet</title>
     <link rel="stylesheet" type="text/css" href="/dist/slyckSchedule.css">
-    <script src="/dist/slyckSchedule.js"></script>
+    <script src="/dist/new.js"></script>
 </head>
 
 <body>
@@ -18,6 +18,14 @@
         <option value="Bob">Bob</option>
         <option value="Frank">Frank</option>
     </select>
+    <br /> Courses:
+    <select id="filter1" onchange="filter1()">
+        <option value="All">All</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+    </select>
     <script>
     var data = [{
         name: 'Ray',
@@ -28,6 +36,10 @@
         startTime: '1479794724', //0600 Local
         endTime: '1479816324', //1200 GMT
     }, {
+        name: 'Ray',
+        startTime: '1479794724', //0600 Local
+        endTime: '1479816324', //1200 GMT
+    },{
         name: 'Bill',
         startTime: '1479794724', //0600 Local
         endTime: '1479805524' //0900 Local
@@ -114,7 +126,7 @@
             }
         },
         card: {
-            //onClick: alertMe,
+            onClick: alertMe,
             size: 20,
             space: 2,
             label: {
@@ -159,18 +171,22 @@
     var update = function() {
         var data1 = [{
             name: 'Ray',
+            course: 1,
             startTime: '1479837924', //1800 Local
             endTime: '1479845124' // 2000 Local
         }, {
             name: 'Bob',
+            course: 2,
             startTime: '1479794724', //0600 Local
             endTime: '1479816324', //1200 GMT
         }, {
             name: 'Steve',
+            course: 3,
             startTime: '1479794724', //0600 Local
             endTime: '1479845124' // 2000 Local
         }, {
             name: 'Frank',
+            course: 4,
             startTime: '1479837924', //1800 Local
             endTime: '1479845124' // 2000 Local
         }];
@@ -182,6 +198,12 @@
         var e = document.getElementById("filter");
         var label = e.options[e.selectedIndex].value;
         schedule1.filter(label);
+    };
+
+    var filter1 = function() {
+        var e = document.getElementById("filter1");
+        var label = e.options[e.selectedIndex].value;
+        schedule1.filterCustom(label);
     };
     </script>
 </body>
