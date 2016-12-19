@@ -326,7 +326,7 @@
                 }
                 this.cards[i].show();
                 if (this.settings.card.tooltip && typeof this.current != 'undefined') {
-                    this.cards[i].tooltip(this.tt.x, this.tt.y);
+                    this.current.tooltip(this.tt.x, this.tt.y);
                 }
             }
         },
