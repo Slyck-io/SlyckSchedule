@@ -359,8 +359,8 @@
 
                 if (temp.length != 0) {
                     var t = -1;
-                    for(var x in temp) {
-                        if(temp[x].values.label == values.label) {
+                    for (var x in temp) {
+                        if (temp[x].values.label == values.label) {
                             t = x;
                             break;
                         }
@@ -383,7 +383,7 @@
                             if (
                                 (end_pos <= this.cards[indexs[i]].left && end_pos >= this.cards[indexs[i]].right) ||
                                 (start_pos >= this.cards[indexs[i]].left && start_pos <= this.cards[indexs[i]].right)
-                                ) {
+                            ) {
                                 index = -1;
                             } else {
                                 index = row;
@@ -434,7 +434,7 @@
             this.container = document.createElement("div");
             this.container.className = 'slyck-schedule-ui';
             this.container.style.width = ((this.width < this.slyck.offsetWidth) ? this.width + 'px' : (this.slyck.offsetWidth - 2) + 'px');
-            this.container.style.height = this.height - (10 + 4) + 'px'; // 10 = font size
+            this.container.style.height = this.height - (this.settings.graph.font.size + 4) + 'px'; // 10 = font size
             this.container.style.border = 'rgba(192, 192, 192, .5) solid 1px'; // Border Color
             this.slyck.insertBefore(this.container, this.slyck.firstChild);
             //End Setup DOM Elements
@@ -444,7 +444,8 @@
                 this.width, //width
                 this.height, //height
                 this.interval, //interval for hours 
-                this.settings.graph.time.format //1 = 24hrs | 0 = 12hrs
+                this.settings.graph.time.format, //1 = 24hrs | 0 = 12hrs
+                this.settings.graph.font.size // font size
             );
             //End Graph
         },
@@ -457,9 +458,9 @@
                     this.cards[i].focus = false;
                 }
                 this.cards[i].show();
-                if (this.settings.card.tooltip && typeof this.current != 'undefined') {
-                    this.current.tooltip(this.tt.x, this.tt.y);
-                }
+            }
+            if (this.settings.card.tooltip && typeof this.current != 'undefined') {
+                this.current.tooltip(this.tt.x, this.tt.y);
             }
         },
         update: function(data) {
@@ -544,7 +545,7 @@
         this.tooltip = function(x, y) {
             var text = this.formatTime(start_time, end_time);
 
-            var rectWidth = this.context.measureText(text).width + 25;
+            var rectWidth = this.context.measureText(text).width + 10;
             var rectHeight = 25;
             var rectX = x - (rectWidth) - 2;
             var rectY = y - (rectHeight);
@@ -553,9 +554,6 @@
             var text_y = rectHeight + rectY - (10 / 2) - 2; //10 = Font size
 
             this.context.save();
-            this.context.fillStyle = 'rgba(0, 0, 0, .5)';
-            this.context.strokeStyle = 'rgba(0, 0, 0, 1)';
-            this.context.lineWidth = 1;
             this.context.beginPath();
             this.context.moveTo(rectX + radius, rectY);
             this.context.lineTo(rectX + rectWidth - radius, rectY);
@@ -567,6 +565,9 @@
             this.context.lineTo(rectX, rectY + radius);
             this.context.quadraticCurveTo(rectX, rectY, rectX + radius, rectY);
             this.context.closePath();
+            this.context.fillStyle = 'rgba(0, 0, 0, .5)';
+            this.context.strokeStyle = 'rgba(0, 0, 0, 1)';
+            this.context.lineWidth = 1;
             this.context.stroke();
             this.context.fill();
             this.context.beginPath();
@@ -619,13 +620,14 @@
         this.tooltipText = this.formatTime(start_time, end_time);
     }
 
-    function Graph(width, height, interval, timeFormat) {
+    function Graph(width, height, interval, timeFormat, fontSize) {
         this.canvas = document.getElementById("schedule");
         this.context = this.canvas.getContext("2d");
         this.width = width;
         this.height = height;
         this.timeFormat = timeFormat;
         this.interval = interval;
+        this.fontSize = fontSize;
         this.context;
         this.hours = [
             ['12:00 AM', '1:00 AM', '2:00 AM', '3:00 AM', '4:00 AM', '5:00 AM', '6:00 AM', '7:00 AM', '8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM', '12:00 AM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM', '6:00 PM', '7:00 PM', '8:00 PM', '9:00 PM', '10:00 PM', '12:00 PM'],
@@ -639,10 +641,10 @@
             this.canvas.height = this.height;
             var pos = this.interval;
 
-            this.context.save();
+            //this.context.save();
             this.context.beginPath();
             this.context.fillStyle = 'rgba(255, 255, 255, 1)'; // Background Color
-            this.context.rect(0, 0, this.width, this.height - (10 + 4)); //10 = font size
+            this.context.rect(0, 0, this.width, this.height - (this.fontSize + 4)); //10 = font size
             this.context.fill();
             this.context.closePath();
 
@@ -650,12 +652,12 @@
                 this.context.beginPath();
                 this.context.strokeStyle = 'rgba(192, 192, 192, .5)';
                 this.context.moveTo(pos, 0);
-                this.context.lineTo(pos, this.height - (10 + 4)); //10 = Font size
+                this.context.lineTo(pos, this.height - (this.fontSize + 4)); //10 = Font size
                 this.context.stroke();
                 this.context.closePath();
 
                 this.context.beginPath();
-                this.context.font = 'italic 10pt Calibri'; //10 = Font Size
+                this.context.font = 'italic ' + this.fontSize + 'pt Calibri'; //10 = Font Size
                 this.context.fillStyle = 'rgba(45, 49, 66, 1)'; //Time Label Color
                 this.context.fillText(this.hours[this.timeFormat][i], (pos - (this.context.measureText(this.hours[this.timeFormat][i]).width / 2)), this.height - 2); //Push text away from bottom
                 this.context.closePath();
@@ -675,7 +677,7 @@
                 pos += this.interval;
             }
 
-            this.context.restore();
+            //this.context.restore();
         }
     }
 
