@@ -317,9 +317,7 @@
 
             //End Event Listeners
         },
-        load: function(data, caller) {
-            var temp = [];
-            temp = this.cards;
+        load: function(data) {
             this.cards = [];
             var rows = 0;
             for (var a in data) {
@@ -359,7 +357,7 @@
                         stroke = this.cards[index].stroke;
                     }
 
-                    if (typeof caller != 'undefined' && caller == 'filter') {
+                    if(typeof this.backup != 'undefined') {
                         var t = -1;
                         for (var x in this.backup) {
                             if (this.backup[x].values.label == values.label) {
@@ -370,20 +368,6 @@
                         if (t >= 0) {
                             fill = this.backup[t].fill;
                             stroke = this.backup[t].stroke;
-                        }
-                    } else {
-                        if (temp.length != 0) {
-                            var t = -1;
-                            for (var x in temp) {
-                                if (temp[x].values.label == values.label) {
-                                    t = x;
-                                    break;
-                                }
-                            }
-                            if (t >= 0) {
-                                fill = temp[t].fill;
-                                stroke = temp[t].stroke;
-                            }
                         }
                     }
 
@@ -487,13 +471,13 @@
         },
         filterCustom: function(data) {
             this.filterItemCustom = data;
-            this.load(this.data, 'filter');
+            this.load(this.data);
             this.clear();
             this.draw();
         },
         filter: function(data) {
             this.filterItem = data;
-            this.load(this.data, 'filter');
+            this.load(this.data);
             this.clear();
             this.draw();
         },
