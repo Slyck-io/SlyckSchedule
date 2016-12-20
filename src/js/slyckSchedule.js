@@ -22,7 +22,7 @@
             };
             self.cards = [];
             self.rows = [];
-            self.backup = [];
+            self.backup = undefined;
             self.scale = {
                 x: 0,
                 y: 0
@@ -317,7 +317,7 @@
 
             //End Event Listeners
         },
-        load: function(data) {
+        load: function(data, caller) {
             var temp = [];
             temp = this.cards;
             this.cards = [];
@@ -327,98 +327,119 @@
                 var fill;
                 var stroke;
                 var values = this.getValues(data[a]);
-                var start_time = new Date((values.start * 1000) + (new Date().getTimezoneOffset() * 60000));
-                var end_time = new Date((values.end * 1000) + (new Date().getTimezoneOffset() * 60000));
-                var start_pos = (start_time.getHours() * this.interval) + this.interval + start_time.getMinutes();
-                var end_pos = (end_time.getHours() * this.interval) + this.interval + end_time.getMinutes();
-                var index = -1;
-                var row;
-                var indexs = [];
 
-                for (var i in this.cards) {
-                    if (this.cards[i].values.label == values.label) indexs.push(i);
-                }
-
-                if (indexs.length > 0) {
-                    index = indexs[0];
-                }
-
-                if (index < 0) {
-                    var r = Math.floor((Math.random() * 255) + 1);
-                    var g = Math.floor((Math.random() * 255) + 1);
-                    var b = Math.floor((Math.random() * 255) + 1);
-
-                    fill = r + ', ' + g + ', ' + b;
-                    stroke = r + ', ' + g + ', ' + b;
-                }
-
-                if (index >= 0) {
-                    fill = this.cards[index].fill;
-                    stroke = this.cards[index].stroke;
-                }
-
-                if (temp.length != 0) {
-                    var t = -1;
-                    for (var x in temp) {
-                        if (temp[x].values.label == values.label) {
-                            t = x;
-                            break;
-                        }
-                    }
-                    if (t >= 0) {
-                        fill = temp[t].fill;
-                        stroke = temp[t].stroke;
-                    }
-                }
-
-                if (indexs.length > 0) {
+                if ((this.filterItem == 'All' || values.label == this.filterItem) && (this.filterItemCustom == 'All' || values.filter == this.filterItemCustom)) {
+                    var start_time = new Date((values.start * 1000) + (new Date().getTimezoneOffset() * 60000));
+                    var end_time = new Date((values.end * 1000) + (new Date().getTimezoneOffset() * 60000));
+                    var start_pos = (start_time.getHours() * this.interval) + this.interval + start_time.getMinutes();
+                    var end_pos = (end_time.getHours() * this.interval) + this.interval + end_time.getMinutes();
+                    var index = -1;
                     var row;
-                    var checked = [];
+                    var indexs = [];
 
-                    for (var i = 0; i < indexs.length; i++) {
-                        row = this.cards[indexs[i]].row - 1;
+                    for (var i in this.cards) {
+                        if (this.cards[i].values.label == values.label) indexs.push(i);
+                    }
 
-                        if (checked.indexOf(row) < 0) {
-                            checked.push(row);
-                            if (
-                                (end_pos <= this.cards[indexs[i]].left && end_pos >= this.cards[indexs[i]].right) ||
-                                (start_pos >= this.cards[indexs[i]].left && start_pos <= this.cards[indexs[i]].right)
-                            ) {
-                                index = -1;
-                            } else {
-                                index = row;
+                    if (indexs.length > 0) {
+                        index = indexs[0];
+                    }
+
+                    if (index < 0) {
+                        var r = Math.floor((Math.random() * 255) + 1);
+                        var g = Math.floor((Math.random() * 255) + 1);
+                        var b = Math.floor((Math.random() * 255) + 1);
+
+                        fill = r + ', ' + g + ', ' + b;
+                        stroke = r + ', ' + g + ', ' + b;
+                    }
+
+                    if (index >= 0) {
+                        fill = this.cards[index].fill;
+                        stroke = this.cards[index].stroke;
+                    }
+
+                    if (typeof caller != 'undefined' && caller == 'filter') {
+                        var t = -1;
+                        for (var x in this.backup) {
+                            if (this.backup[x].values.label == values.label) {
+                                t = x;
+                                break;
+                            }
+                        }
+                        if (t >= 0) {
+                            fill = this.backup[t].fill;
+                            stroke = this.backup[t].stroke;
+                        }
+                    } else {
+                        if (temp.length != 0) {
+                            var t = -1;
+                            for (var x in temp) {
+                                if (temp[x].values.label == values.label) {
+                                    t = x;
+                                    break;
+                                }
+                            }
+                            if (t >= 0) {
+                                fill = temp[t].fill;
+                                stroke = temp[t].stroke;
                             }
                         }
                     }
-                }
 
-                if (index < 0) {
-                    index = rows + 1;
-                    rows++;
-                } else {
-                    index++;
-                }
+                    if (indexs.length > 0) {
+                        var row;
+                        var checked = [];
 
-                var pos = (index * this.settings.card.size) + (index * (this.settings.card.space * 2));
+                        for (var i = 0; i < indexs.length; i++) {
+                            row = this.cards[indexs[i]].row - 1;
 
-                var card = new Card(
-                    start_pos, //Left
-                    end_pos, //Right
-                    pos, //Top
-                    (pos + this.settings.card.size), //Bottom
-                    this.settings.card.size, //size
-                    data[a], //data
-                    values, //values
-                    index, // row
-                    this.settings.graph.time.format, //time
-                    fill, //Fill Color
-                    stroke //Stroke Color
-                );
+                            if (checked.indexOf(row) < 0) {
+                                checked.push(row);
+                                if (
+                                    (end_pos <= this.cards[indexs[i]].left && end_pos >= this.cards[indexs[i]].right) ||
+                                    (start_pos >= this.cards[indexs[i]].left && start_pos <= this.cards[indexs[i]].right)
+                                ) {
+                                    index = -1;
+                                } else {
+                                    index = row;
+                                }
+                            }
+                        }
+                    }
 
-                this.cards.push(card); //add card to card array
+                    if (index < 0) {
+                        index = rows + 1;
+                        rows++;
+                    } else {
+                        index++;
+                    }
+
+                    var pos = (index * this.settings.card.size) + (index * (this.settings.card.space * 2));
+
+                    var card = new Card(
+                        start_pos, //Left
+                        end_pos, //Right
+                        pos, //Top
+                        (pos + this.settings.card.size), //Bottom
+                        this.settings.card.size, //size
+                        data[a], //data
+                        values, //values
+                        index, // row
+                        this.settings.graph.time.format, //time
+                        fill, //Fill Color
+                        stroke //Stroke Color
+                    );
+
+                    this.cards.push(card); //add card to card array
+                } 
             }
 
             this.rows = rows;
+
+            if(typeof this.backup == 'undefined') {
+                this.backup = this.cards;
+            }
 
             //Start setup
             this.setup();
@@ -452,11 +473,6 @@
         draw: function() {
             this.graph.show(); //Shows the Graph in the canvas
             for (var i in this.cards) {
-                if ((this.filterItem == 'All' || this.cards[i].values.label == this.filterItem) && (this.filterItemCustom == 'All' || this.cards[i].values.filter == this.filterItemCustom)) {
-                    this.cards[i].focus = true;
-                } else {
-                    this.cards[i].focus = false;
-                }
                 this.cards[i].show();
             }
             if (this.settings.card.tooltip && typeof this.current != 'undefined') {
@@ -464,17 +480,20 @@
             }
         },
         update: function(data) {
+            this.data = data
             this.load(data);
             this.clear();
             this.draw();
         },
         filterCustom: function(data) {
             this.filterItemCustom = data;
+            this.load(this.data, 'filter');
             this.clear();
             this.draw();
         },
         filter: function(data) {
             this.filterItem = data;
+            this.load(this.data, 'filter');
             this.clear();
             this.draw();
         },
@@ -511,7 +530,7 @@
         this.fill = fill;
         this.stroke = stroke;
         this.time = time;
-        this.focus = true; //For Filtering
+        this.focus = true; //For Filtering maybe?
 
         this.show = function() {
             //Start Shape
