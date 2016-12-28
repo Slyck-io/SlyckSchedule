@@ -1,6 +1,6 @@
 {
   "name": "SlyckSchedule",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "description": "HTML5 Canvas and Javascript Task Schedule",
   "main": "dist/js/slyckSchedule.min.js",
   "directories": {
