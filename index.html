@@ -7,7 +7,6 @@
 </head>
 
 <body>
-    <slyck-schedule></slyck-schedule>
     <button onclick="update()">Update with new Data</button>
     <br /> Filter:
     <select id="filter" onchange="filter()">
@@ -18,88 +17,203 @@
         <option value="Bob">Bob</option>
         <option value="Frank">Frank</option>
     </select>
+    <br /> Courses:
+    <select id="filter1" onchange="filter1()">
+        <option value="All">All</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+    </select>
+    <slyck-schedule></slyck-schedule>
     <script>
-    var data = [{
-        name: 'Ray',
-        startTime: '1479837924', //1800 Local
-        endTime: '1479845124' // 2000 Local
-    }, {
-        name: 'Bob',
-        startTime: '1479794724', //0600 Local
-        endTime: '1479816324', //1200 GMT
-    }, {
-        name: 'Bill',
-        startTime: '1479794724', //0600 Local
-        endTime: '1479805524' //0900 Local
-    }, {
-        name: 'Steve',
-        startTime: '1479794724', //0600 Local
-        endTime: '1479845124' // 2000 Local
-    }, {
-        name: 'Frank',
-        startTime: '1479837924', //1800 Local
-        endTime: '1479845124' // 2000 Local
-    }, {
-        name: 'Ray',
-        startTime: '1479837924', //1800 Local
-        endTime: '1479845124' // 2000 Local
-    }, {
-        name: 'Bob',
-        startTime: '1479794724', //0600 Local
-        endTime: '1479816324', //1200 GMT
-    }, {
-        name: 'Bill',
-        startTime: '1479794724', //0600 Local
-        endTime: '1479805524' //0900 Local
-    }, {
-        name: 'Steve',
-        startTime: '1479794724', //0600 Local
-        endTime: '1479845124' // 2000 Local
-    }, {
-        name: 'Frank',
-        startTime: '1479837924', //1800 Local
-        endTime: '1479845124' // 2000 Local
-    }, {
-        name: 'Ray',
-        startTime: '1479837924', //1800 Local
-        endTime: '1479845124' // 2000 Local
-    }, {
-        name: 'Bob',
-        startTime: '1479794724', //0600 Local
-        endTime: '1479816324', //1200 GMT
-    }, {
-        name: 'Bill',
-        startTime: '1479794724', //0600 Local
-        endTime: '1479805524' //0900 Local
-    }, {
-        name: 'Steve',
-        startTime: '1479794724', //0600 Local
-        endTime: '1479845124' // 2000 Local
-    }, {
-        name: 'Frank',
-        startTime: '1479837924', //1800 Local
-        endTime: '1479845124' // 2000 Local
-    }, {
-        name: 'Ray',
-        startTime: '1479837924', //1800 Local
-        endTime: '1479845124' // 2000 Local
-    }, {
-        name: 'Bob',
-        startTime: '1479794724', //0600 Local
-        endTime: '1479816324', //1200 GMT
-    }, {
-        name: 'Bill',
-        startTime: '1479794724', //0600 Local
-        endTime: '1479805524' //0900 Local
-    }, {
-        name: 'Steve',
-        startTime: '1479794724', //0600 Local
-        endTime: '1479845124' // 2000 Local
-    }, {
-        name: 'Frank',
-        startTime: '1479837924', //1800 Local
-        endTime: '1479845124' // 2000 Local
-    }];
+    
+        var data = [{
+            name: 'Ray',
+            course: 1,
+            startTime: '1479837924', //1800 Local
+            endTime: '1479845124' // 2000 Local
+        }, {
+            name: 'Bob',
+            course: 2,
+            startTime: '1479794724', //0600 Local
+            endTime: '1479816324', //1200 GMT
+        }, {
+            name: 'Ray',
+            course: 2,
+            startTime: '1479794724', //0600 Local
+            endTime: '1479816324', //1200 GMT
+        },{
+            name: 'Bill',
+            course: 3,
+            startTime: '1479794724', //0600 Local
+            endTime: '1479805524' //0900 Local
+        }, {
+            name: 'Steve',
+            course: 4,
+            startTime: '1479794724', //0600 Local
+            endTime: '1479845124' // 2000 Local
+        }, {
+            name: 'Frank',
+            course: 5,
+            startTime: '1479837924', //1800 Local
+            endTime: '1479845124' // 2000 Local
+        }, {
+            name: 'Ray',
+            course: 1,
+            startTime: '1479837924', //1800 Local
+            endTime: '1479845124' // 2000 Local
+        }, {
+            name: 'Ray',
+            course: 1,
+            startTime: '1479794724', //0600 Local
+            endTime: '1479816324', //1200 GMT
+        }, {
+            name: 'Bob',
+            course: 2,
+            startTime: '1479794724', //0600 Local
+            endTime: '1479816324', //1200 GMT
+        }, {
+            name: 'Bill',
+            course: 3,
+            startTime: '1479794724', //0600 Local
+            endTime: '1479805524' //0900 Local
+        }, {
+            name: 'Steve',
+            course: 4,
+            startTime: '1479794724', //0600 Local
+            endTime: '1479845124' // 2000 Local
+        }, {
+            name: 'Frank',
+            course: 5,
+            startTime: '1479837924', //1800 Local
+            endTime: '1479845124' // 2000 Local
+        }, {
+            name: 'Ray',
+            course: 1,
+            startTime: '1479837924', //1800 Local
+            endTime: '1479845124' // 2000 Local
+        }, {
+            name: 'Bob',
+            course: 2,
+            startTime: '1479794724', //0600 Local
+            endTime: '1479816324', //1200 GMT
+        }, {
+            name: 'Bill',
+            course: 3,
+            startTime: '1479794724', //0600 Local
+            endTime: '1479805524' //0900 Local
+        }, {
+            name: 'Steve',
+            course: 4,
+            startTime: '1479794724', //0600 Local
+            endTime: '1479845124' // 2000 Local
+        }, {
+            name: 'Frank',
+            course: 5,
+            startTime: '1479837924', //1800 Local
+            endTime: '1479845124' // 2000 Local
+        }, {
+            name: 'Ray',
+            course: 1,
+            startTime: '1479837924', //1800 Local
+            endTime: '1479845124' // 2000 Local
+        }, {
+            name: 'Bob',
+            course: 2,
+            startTime: '1479794724', //0600 Local
+            endTime: '1479816324', //1200 GMT
+        }, {
+            name: 'Bill',
+            course: 3,
+            startTime: '1479794724', //0600 Local
+            endTime: '1479805524' //0900 Local
+        }, {
+            name: 'Steve',
+            course: 4,
+            startTime: '1479794724', //0600 Local
+            endTime: '1479845124' // 2000 Local
+        }, {
+            name: 'Frank',
+            course: 5,
+            startTime: '1479837924', //1800 Local
+            endTime: '1479845124' // 2000 Local
+        }];
+        
+        /*
+    var data = [
+        [{
+            "Id": 75,
+            "TutoringCenterId": 76,
+            "TutorId": 5823,
+            "StartTime": 212400000,
+            "EndTime": 223200000,
+            "CreatorId": 5810,
+            "Tc": null,
+            "Tutor": {
+                "TutorId": 5823,
+                "ResourceCenterId": 28,
+                "AverageReview": 4.625,
+                "Courses": [],
+                "Reviews": [],
+                "PersonId": 5823,
+                "UniversityId": 1,
+                "UserName": "testuser",
+                "FirstName": "Ethan",
+                "LastName": "Keiser",
+                "Email": "testuser12@drexel.edu",
+                "ProfilePhotoUri": "https://scontent.fash1-1.fna.fbcdn.net/v/t1.0-9/12193824_10156233591920241_1599280500473540916_n.jpg?oh=8504a0ad6a8ae4fd19a10f95fe709d1e&oe=582B467B"
+            }
+        }],
+        [{
+            "Id": 77,
+            "TutoringCenterId": 76,
+            "TutorId": 5823,
+            "StartTime": 424800000,
+            "EndTime": 431940000,
+            "CreatorId": 5810,
+            "Tc": null,
+            "Tutor": {
+                "TutorId": 5823,
+                "ResourceCenterId": 28,
+                "AverageReview": 4.625,
+                "Courses": [],
+                "Reviews": [],
+                "PersonId": 5823,
+                "UniversityId": 1,
+                "UserName": "testuser",
+                "FirstName": "Ethan",
+                "LastName": "Keiser",
+                "Email": "testuser12@drexel.edu",
+                "ProfilePhotoUri": "https://scontent.fash1-1.fna.fbcdn.net/v/t1.0-9/12193824_10156233591920241_1599280500473540916_n.jpg?oh=8504a0ad6a8ae4fd19a10f95fe709d1e&oe=582B467B"
+            }
+        }],
+        [{
+            "Id": 70,
+            "TutoringCenterId": 76,
+            "TutorId": 5823,
+            "StartTime": 595200000,
+            "EndTime": 603900000,
+            "CreatorId": 5810,
+            "Tc": null,
+            "Tutor": {
+                "TutorId": 5823,
+                "ResourceCenterId": 28,
+                "AverageReview": 4.625,
+                "Courses": [],
+                "Reviews": [],
+                "PersonId": 5823,
+                "UniversityId": 1,
+                "UserName": "testuser",
+                "FirstName": "Ethan",
+                "LastName": "Keiser",
+                "Email": "testuser12@drexel.edu",
+                "ProfilePhotoUri": "https://scontent.fash1-1.fna.fbcdn.net/v/t1.0-9/12193824_10156233591920241_1599280500473540916_n.jpg?oh=8504a0ad6a8ae4fd19a10f95fe709d1e&oe=582B467B"
+            }
+        }]
+    ];
+    */
 
     var alertMe = function(data) {
         alert('You clicked\n' + JSON.stringify(data));
@@ -114,42 +228,16 @@
             }
         },
         card: {
-            //onClick: alertMe,
+            onClick: alertMe,
             size: 20,
-            space: 2,
-            label: {
-                size: 10,
-                color: [45, 49, 66, 1]
-            },
-            random: true,
-            colors: [
-                ['#73C6B6'],
-                ['#82E0AA'],
-                ['#F5B7B1'],
-                ['#57A3F6'],
-                ['#D133B0'],
-                ['#1CE796'],
-                ['#827DF5'],
-                ['#B6134F'],
-                ['#6A61D6'],
-                ['#8A8BE3'],
-                ['#C00A79'],
-                ['#10B8DA'],
-                ['#E90FC5'],
-                ['#E3F55D'],
-                ['#CD8487'],
-                ['#8578FE'],
-                ['#21ED9C'],
-                ['#875971'],
-                ['#E64EB9']
-            ]
+            space: 2
         },
         graph: {
             font: {
-                size: 8
+                size: 10
             },
             time: {
-                format: '24'
+                format: '12'
             }
         }
     });
@@ -159,18 +247,22 @@
     var update = function() {
         var data1 = [{
             name: 'Ray',
+            course: 1,
             startTime: '1479837924', //1800 Local
             endTime: '1479845124' // 2000 Local
         }, {
             name: 'Bob',
+            course: 2,
             startTime: '1479794724', //0600 Local
             endTime: '1479816324', //1200 GMT
         }, {
             name: 'Steve',
+            course: 3,
             startTime: '1479794724', //0600 Local
             endTime: '1479845124' // 2000 Local
         }, {
             name: 'Frank',
+            course: 4,
             startTime: '1479837924', //1800 Local
             endTime: '1479845124' // 2000 Local
         }];
@@ -182,6 +274,12 @@
         var e = document.getElementById("filter");
         var label = e.options[e.selectedIndex].value;
         schedule1.filter(label);
+    };
+
+    var filter1 = function() {
+        var e = document.getElementById("filter1");
+        var label = e.options[e.selectedIndex].value;
+        schedule1.filterCustom(label);
     };
     </script>
 </body>
